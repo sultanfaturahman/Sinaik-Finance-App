@@ -1,4 +1,4 @@
-import { Home, Receipt, FileText, TrendingUp, LogOut, Menu } from 'lucide-react';
+import { Home, Receipt, FileText, TrendingUp, LogOut, Menu, Sparkles } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import {
   Sidebar,
@@ -21,6 +21,7 @@ const menuItems = [
   { title: 'Transaksi', url: '/transactions', icon: Receipt },
   { title: 'Laporan', url: '/reports', icon: FileText },
   { title: 'Status UMKM', url: '/status', icon: TrendingUp },
+  { title: 'AI Strategi', url: '/ai-strategy', icon: Sparkles },
 ];
 
 export function AppSidebar() {

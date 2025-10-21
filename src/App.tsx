@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Reports from "./pages/Reports";
 import Status from "./pages/Status";
+import AIStrategy from "./pages/AIStrategy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,16 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <Status />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ai-strategy"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <AIStrategy />
                   </AppLayout>
                 </ProtectedRoute>
               }
