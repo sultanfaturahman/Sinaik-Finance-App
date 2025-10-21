@@ -8,8 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ExcelImport } from '@/components/ExcelImport';
+import { ExcelExport } from '@/components/ExcelExport';
 import { formatCurrency, formatDateShort } from '@/utils/formatCurrency';
-import { Plus, Pencil, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, Pencil, Trash2, TrendingUp, TrendingDown, Info } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Transaction {
@@ -19,6 +22,7 @@ interface Transaction {
   category: string;
   date: string;
   note: string | null;
+  source: 'manual' | 'excel' | 'pwa';
 }
 
 const Transactions = () => {
@@ -148,85 +152,97 @@ const Transactions = () => {
           <h1 className="text-3xl font-bold text-foreground">Transaksi</h1>
           <p className="text-muted-foreground mt-1">Kelola pemasukan dan pengeluaran</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={(open) => {
-          setDialogOpen(open);
-          if (!open) resetForm();
-        }}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Tambah Transaksi
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingId ? 'Edit Transaksi' : 'Tambah Transaksi Baru'}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Jenis</Label>
-                <Select
-                  value={formData.type}
-                  onValueChange={(value: 'income' | 'expense') =>
-                    setFormData({ ...formData, type: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="income">Pemasukan</SelectItem>
-                    <SelectItem value="expense">Pengeluaran</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Jumlah</Label>
-                <Input
-                  type="number"
-                  placeholder="100000"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Kategori</Label>
-                <Input
-                  type="text"
-                  placeholder="Penjualan produk"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Tanggal</Label>
-                <Input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Catatan (opsional)</Label>
-                <Input
-                  type="text"
-                  placeholder="Catatan tambahan"
-                  value={formData.note}
-                  onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                {editingId ? 'Perbarui' : 'Simpan'}
+        <div className="flex gap-2">
+          <ExcelExport />
+          <ExcelImport onImportComplete={fetchTransactions} />
+          <Dialog open={dialogOpen} onOpenChange={(open) => {
+            setDialogOpen(open);
+            if (!open) resetForm();
+          }}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah Transaksi
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  {editingId ? 'Edit Transaksi' : 'Tambah Transaksi Baru'}
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Jenis</Label>
+                  <Select
+                    value={formData.type}
+                    onValueChange={(value: 'income' | 'expense') =>
+                      setFormData({ ...formData, type: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="income">Pemasukan</SelectItem>
+                      <SelectItem value="expense">Pengeluaran</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Jumlah</Label>
+                  <Input
+                    type="number"
+                    placeholder="100000"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Kategori</Label>
+                  <Input
+                    type="text"
+                    placeholder="Penjualan produk"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tanggal</Label>
+                  <Input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Catatan (opsional)</Label>
+                  <Input
+                    type="text"
+                    placeholder="Catatan tambahan"
+                    value={formData.note}
+                    onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  {editingId ? 'Perbarui' : 'Simpan'}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
+
+      <Alert className="border-primary/20 bg-primary/5">
+        <Info className="h-4 w-4 text-primary" />
+        <AlertDescription className="text-sm text-muted-foreground">
+          <strong>Tips:</strong> Gunakan import Excel untuk menambahkan banyak transaksi sekaligus. 
+          Sistem akan otomatis mendeteksi dan melewati transaksi duplikat berdasarkan tanggal, jenis, kategori, dan jumlah yang sama.
+        </AlertDescription>
+      </Alert>
 
       <Card>
         <CardHeader>
@@ -237,7 +253,7 @@ const Transactions = () => {
             <div className="text-center py-12">
               <p className="text-muted-foreground">Belum ada transaksi.</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Klik tombol "Tambah Transaksi" untuk memulai.
+                Klik "Tambah Transaksi" atau "Import Excel" untuk memulai.
               </p>
             </div>
           ) : (
@@ -245,12 +261,13 @@ const Transactions = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Tanggal</TableHead>
-                    <TableHead>Jenis</TableHead>
-                    <TableHead>Kategori</TableHead>
-                    <TableHead>Jumlah</TableHead>
-                    <TableHead>Catatan</TableHead>
-                    <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead>Tanggal</TableHead>
+                  <TableHead>Jenis</TableHead>
+                  <TableHead>Kategori</TableHead>
+                  <TableHead>Jumlah</TableHead>
+                  <TableHead>Catatan</TableHead>
+                  <TableHead>Sumber</TableHead>
+                  <TableHead className="text-right">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -278,6 +295,11 @@ const Transactions = () => {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {transaction.note || '-'}
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-xs px-2 py-1 rounded-full bg-muted">
+                          {transaction.source === 'manual' ? 'Manual' : transaction.source === 'excel' ? 'Excel' : 'PWA'}
+                        </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
