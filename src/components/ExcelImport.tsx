@@ -27,7 +27,13 @@ interface ParsedTransaction {
   error?: string;
 }
 
-export const ExcelImport = ({ onImportComplete }: { onImportComplete: () => void }) => {
+export const ExcelImport = ({
+  onImportComplete,
+  onCategoriesImported,
+}: {
+  onImportComplete: () => void;
+  onCategoriesImported?: (categories: string[]) => void;
+}) => {
   const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [parsedData, setParsedData] = useState<ParsedTransaction[]>([]);
@@ -207,6 +213,7 @@ export const ExcelImport = ({ onImportComplete }: { onImportComplete: () => void
       setDialogOpen(false);
       setParsedData([]);
       onImportComplete();
+      onCategoriesImported?.(validTransactions.map((transaction) => transaction.category));
     } catch (error) {
       console.error('Error importing:', error);
       toast.error('Terjadi kesalahan saat import');
@@ -245,19 +252,19 @@ export const ExcelImport = ({ onImportComplete }: { onImportComplete: () => void
 
   return (
     <>
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={downloadTemplate}>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Button variant="outline" onClick={downloadTemplate} className="w-full sm:w-auto">
           <Upload className="h-4 w-4 mr-2" />
           Download Template
         </Button>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <input
             type="file"
             accept=".xlsx,.xls"
             onChange={handleFileUpload}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
-          <Button>
+          <Button className="w-full sm:w-auto">
             <Upload className="h-4 w-4 mr-2" />
             Import Excel
           </Button>

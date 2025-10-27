@@ -98,7 +98,7 @@ const Auth = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
-      <Card className="w-full max-w-md shadow-lg">
+      <Card className="w-full max-w-sm shadow-lg">
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground mb-2">
             <TrendingUp className="h-8 w-8" />

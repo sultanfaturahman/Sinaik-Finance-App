@@ -68,6 +68,48 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string | null
+      }
+      Relationships: []
+    }
+      financial_reports: {
+        Row: {
+          created_at: string | null
+          frequency: Database["public"]["Enums"]["report_frequency"]
+          id: string
+          note: string | null
+          report_date: string
+          total_expense: number | null
+          total_income: number | null
+          updated_at: string | null
+          user_id: string
+          income_category: string | null
+          expense_category: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          frequency: Database["public"]["Enums"]["report_frequency"]
+          id?: string
+          note?: string | null
+          report_date: string
+          total_expense?: number | null
+          total_income?: number | null
+          updated_at?: string | null
+          user_id: string
+          income_category?: string | null
+          expense_category?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          frequency?: Database["public"]["Enums"]["report_frequency"]
+          id?: string
+          note?: string | null
+          report_date?: string
+          total_expense?: number | null
+          total_income?: number | null
+          updated_at?: string | null
+          user_id?: string
+          income_category?: string | null
+          expense_category?: string | null
         }
         Relationships: []
       }
@@ -303,6 +345,7 @@ export const Constants = {
       app_role: ["admin", "owner", "cashier"],
       transaction_source: ["pwa", "excel", "manual"],
       transaction_type: ["income", "expense"],
+      report_frequency: ["daily", "monthly"],
       umkm_level: ["ultra_mikro", "super_mikro", "mikro", "kecil"],
     },
   },

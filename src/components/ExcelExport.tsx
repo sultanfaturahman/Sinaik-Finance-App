@@ -1,11 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
+import { Button, type ButtonProps } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
-export const ExcelExport = () => {
+export const ExcelExport = ({ className, ...buttonProps }: ButtonProps) => {
   const { user } = useAuth();
 
   const handleExport = async () => {
@@ -69,7 +69,12 @@ export const ExcelExport = () => {
   };
 
   return (
-    <Button variant="outline" onClick={handleExport}>
+    <Button
+      variant="outline"
+      onClick={handleExport}
+      className={className}
+      {...buttonProps}
+    >
       <Download className="h-4 w-4 mr-2" />
       Export Excel
     </Button>

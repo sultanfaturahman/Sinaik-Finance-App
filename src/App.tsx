@@ -5,8 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
@@ -14,25 +12,11 @@ import Reports from "./pages/Reports";
 import Status from "./pages/Status";
 import AIStrategy from "./pages/AIStrategy";
 import NotFound from "./pages/NotFound";
+import ImportExport from "./pages/ImportExport";
+import Settings from "./pages/Settings";
+import Notes from "./pages/Notes";
 
 const queryClient = new QueryClient();
-
-const AppLayout = ({ children }: { children: React.ReactNode }) => (
-  <SidebarProvider>
-    <div className="flex min-h-screen w-full">
-      <AppSidebar />
-      <div className="flex-1 flex flex-col">
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-6">
-          <SidebarTrigger />
-          <div className="flex-1" />
-        </header>
-        <main className="flex-1 p-6 bg-muted/30">
-          {children}
-        </main>
-      </div>
-    </div>
-  </SidebarProvider>
-);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -48,9 +32,7 @@ const App = () => (
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <AppLayout>
-                    <Dashboard />
-                  </AppLayout>
+                  <Dashboard />
                 </ProtectedRoute>
               }
             />
@@ -58,9 +40,15 @@ const App = () => (
               path="/transactions"
               element={
                 <ProtectedRoute>
-                  <AppLayout>
-                    <Transactions />
-                  </AppLayout>
+                  <Transactions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notes"
+              element={
+                <ProtectedRoute>
+                  <Notes />
                 </ProtectedRoute>
               }
             />
@@ -68,9 +56,7 @@ const App = () => (
               path="/reports"
               element={
                 <ProtectedRoute>
-                  <AppLayout>
-                    <Reports />
-                  </AppLayout>
+                  <Reports />
                 </ProtectedRoute>
               }
             />
@@ -78,9 +64,7 @@ const App = () => (
               path="/status"
               element={
                 <ProtectedRoute>
-                  <AppLayout>
-                    <Status />
-                  </AppLayout>
+                  <Status />
                 </ProtectedRoute>
               }
             />
@@ -88,9 +72,23 @@ const App = () => (
               path="/ai-strategy"
               element={
                 <ProtectedRoute>
-                  <AppLayout>
-                    <AIStrategy />
-                  </AppLayout>
+                  <AIStrategy />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/import-export"
+              element={
+                <ProtectedRoute>
+                  <ImportExport />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
                 </ProtectedRoute>
               }
             />

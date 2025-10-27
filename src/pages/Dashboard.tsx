@@ -1,9 +1,15 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatCurrency } from '@/utils/formatCurrency';
-import { TrendingUp, TrendingDown, Wallet, Receipt } from 'lucide-react';
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { TrendingUp, TrendingDown, Wallet, Receipt } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { AppShell } from "@/app/AppShell";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { Section } from "@/components/ui/Section";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatCurrency } from "@/utils/formatCurrency";
+import { useCategorySuggestions } from "@/hooks/useCategorySuggestions";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
 
 interface DashboardStats {
   totalIncome: number;
@@ -14,6 +20,7 @@ interface DashboardStats {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { onboardingCompleted, ready: onboardingReady } = useCategorySuggestions();
   const [stats, setStats] = useState<DashboardStats>({
     totalIncome: 0,
     totalExpense: 0,
@@ -21,23 +28,24 @@ const Dashboard = () => {
     transactionCount: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
       if (!user) return;
 
       const { data: transactions } = await supabase
-        .from('transactions')
-        .select('type, amount')
-        .eq('user_id', user.id);
+        .from("transactions")
+        .select("type, amount")
+        .eq("user_id", user.id);
 
       if (transactions) {
         const income = transactions
-          .filter((t) => t.type === 'income')
+          .filter((t) => t.type === "income")
           .reduce((sum, t) => sum + Number(t.amount), 0);
-        
+
         const expense = transactions
-          .filter((t) => t.type === 'expense')
+          .filter((t) => t.type === "expense")
           .reduce((sum, t) => sum + Number(t.amount), 0);
 
         setStats({
@@ -53,103 +61,119 @@ const Dashboard = () => {
     fetchStats();
   }, [user]);
 
-  const statCards = [
+  useEffect(() => {
+    if (!onboardingReady) return;
+    setShowOnboarding(!onboardingCompleted);
+  }, [onboardingCompleted, onboardingReady]);
+
+  type StatVariant = "default" | "positive" | "negative";
+  const statCards: Array<{
+    title: string;
+    value: ReactNode;
+    icon?: ReactNode;
+    helper?: string;
+    variant?: StatVariant;
+  }> = [
     {
-      title: 'Total Pemasukan',
-      value: stats.totalIncome,
-      icon: TrendingUp,
-      color: 'text-success',
-      bgColor: 'bg-success/10',
+      title: "Total Pemasukan",
+      value: formatCurrency(stats.totalIncome),
+      icon: <TrendingUp className="h-5 w-5 text-success" />,
+      variant: "positive" as const,
+      helper: "Akumulasi sejak awal tahun",
     },
     {
-      title: 'Total Pengeluaran',
-      value: stats.totalExpense,
-      icon: TrendingDown,
-      color: 'text-destructive',
-      bgColor: 'bg-destructive/10',
+      title: "Total Pengeluaran",
+      value: formatCurrency(stats.totalExpense),
+      icon: <TrendingDown className="h-5 w-5 text-destructive" />,
+      variant: "negative" as const,
+      helper: "Termasuk biaya operasional dan tetap",
     },
     {
-      title: 'Laba Bersih',
-      value: stats.netProfit,
-      icon: Wallet,
-      color: stats.netProfit >= 0 ? 'text-success' : 'text-destructive',
-      bgColor: stats.netProfit >= 0 ? 'bg-success/10' : 'bg-destructive/10',
+      title: "Laba Bersih",
+      value: formatCurrency(stats.netProfit),
+      icon: <Wallet className="h-5 w-5 text-primary" />,
+      variant: stats.netProfit >= 0 ? ("positive" as StatVariant) : ("negative" as StatVariant),
+      helper: stats.netProfit >= 0 ? "Kondisi kas sehat" : "Perlu evaluasi pengeluaran",
     },
     {
-      title: 'Total Transaksi',
-      value: stats.transactionCount,
-      icon: Receipt,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
-      isCount: true,
+      title: "Total Transaksi",
+      value: stats.transactionCount.toLocaleString("id-ID"),
+      icon: <Receipt className="h-5 w-5 text-primary" />,
+      helper: "Jumlah transaksi tercatat",
     },
   ];
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Ringkasan keuangan bisnis Anda</p>
-      </div>
+    <AppShell title="Dashboard" subtitle="Ringkasan terkini performa usaha Anda">
+      <OnboardingWizard
+        open={showOnboarding}
+        onOpenChange={setShowOnboarding}
+        onCompleted={() => setShowOnboarding(false)}
+      />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {statCards.map((stat) => (
-          <Card key={stat.title} className="transition-all hover:shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {stat.title}
-              </CardTitle>
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${stat.color}`}>
-                {stat.isCount ? stat.value : formatCurrency(stat.value)}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Selamat Datang di SiNaik!</CardTitle>
-          <CardDescription>
-            Sistem Informasi Naik Kelas untuk UMKM Cilegon
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Mulai kelola keuangan bisnis Anda dengan mudah. Tambahkan transaksi pemasukan dan
-            pengeluaran untuk melihat laporan lengkap dan status klasifikasi UMKM Anda.
-          </p>
-          <div className="grid gap-2 text-sm">
-            <div className="flex items-start gap-2">
-              <div className="mt-0.5 h-2 w-2 rounded-full bg-primary"></div>
-              <p><span className="font-medium">Catat transaksi</span> - Kelola pemasukan dan pengeluaran harian</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="mt-0.5 h-2 w-2 rounded-full bg-primary"></div>
-              <p><span className="font-medium">Lihat laporan</span> - Analisis keuangan bulanan dan tahunan</p>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="mt-0.5 h-2 w-2 rounded-full bg-primary"></div>
-              <p><span className="font-medium">Cek status UMKM</span> - Pantau klasifikasi bisnis Anda</p>
-            </div>
+      {loading ? (
+        <DashboardSkeleton />
+      ) : (
+        <div className="flex flex-col gap-6">
+          <div data-testid="stats-grid" className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {statCards.map((card) => (
+              <StatCard
+                key={card.title}
+                title={card.title}
+                value={card.value}
+                icon={card.icon}
+                helper={card.helper}
+                variant={card.variant}
+              />
+            ))}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+
+          <Section
+            title="Selamat Datang di SiNaik!"
+            description="Sistem Informasi Naik Kelas untuk UMKM Cilegon."
+          >
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Mulai kelola keuangan bisnis Anda dengan mudah. Tambahkan transaksi pemasukan dan
+              pengeluaran untuk melihat laporan lengkap dan status klasifikasi UMKM Anda.
+            </p>
+            <div className="grid gap-3 text-sm md:grid-cols-3">
+              <ChecklistItem title="Catat transaksi">
+                Kelola pemasukan dan pengeluaran harian secara rutin.
+              </ChecklistItem>
+              <ChecklistItem title="Lihat laporan">
+                Analisis keuangan bulanan dan tahunan dengan cepat.
+              </ChecklistItem>
+              <ChecklistItem title="Cek status UMKM">
+                Pantau klasifikasi bisnis Anda dan target level berikutnya.
+              </ChecklistItem>
+            </div>
+          </Section>
+        </div>
+      )}
+    </AppShell>
   );
 };
 
+const ChecklistItem = ({ title, children }: { title: string; children: ReactNode }) => (
+  <div className="flex items-start gap-3 rounded-2xl border border-dashed border-border/70 bg-background px-4 py-3">
+    <span className="mt-1 block h-2 w-2 rounded-full bg-primary" />
+    <div>
+      <p className="font-medium text-foreground">{title}</p>
+      <p className="text-xs text-muted-foreground leading-snug">{children}</p>
+    </div>
+  </div>
+);
+
+const DashboardSkeleton = () => (
+  <div className="flex flex-col gap-6">
+    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <Skeleton key={index} className="h-32 rounded-2xl" />
+      ))}
+    </div>
+    <Skeleton className="h-44 rounded-2xl" />
+  </div>
+);
+
 export default Dashboard;
+
