@@ -78,11 +78,11 @@ define(['./workbox-ed3775ef'], (function (workbox) { 'use strict';
    * See https://goo.gl/S9QRab
    */
   workbox.precacheAndRoute([{
-    "url": "index.html",
-    "revision": "0.j0jm6905et8"
+    "url": "/index.html",
+    "revision": "0.s935j80u6qo"
   }], {});
   workbox.cleanupOutdatedCaches();
-  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
+  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("/index.html"), {
     allowlist: [/^\/$/]
   }));
   workbox.registerRoute(/^https:\/\/[a-z0-9.-]*supabase\.co\/.*/, new workbox.NetworkFirst({

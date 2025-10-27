@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_strategy_runs: {
+        Row: {
+          created_at: string
+          financial_summary: Json
+          goals: Json
+          id: string
+          model: string | null
+          payload_hash: string
+          profile: Json
+          raw_response: string | null
+          strategy: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          financial_summary: Json
+          goals: Json
+          id?: string
+          model?: string | null
+          payload_hash: string
+          profile: Json
+          raw_response?: string | null
+          strategy: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          financial_summary?: Json
+          goals?: Json
+          id?: string
+          model?: string | null
+          payload_hash?: string
+          profile?: Json
+          raw_response?: string | null
+          strategy?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       import_jobs: {
         Row: {
           created_at: string | null
@@ -68,9 +110,9 @@ export type Database = {
           id?: string
           name?: string
           updated_at?: string | null
+        }
+        Relationships: []
       }
-      Relationships: []
-    }
       financial_reports: {
         Row: {
           created_at: string | null

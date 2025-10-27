@@ -71,3 +71,19 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## Environment configuration
+
+Supabase Edge Functions sekarang terhubung langsung ke Gemini API. Setiap environment membutuhkan variabel berikut:
+
+```bash
+# client
+VITE_PUBLIC_SUPABASE_URL=
+VITE_PUBLIC_SUPABASE_ANON_KEY=
+
+# server (supabase secrets)
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+Gunakan `supabase secrets set GEMINI_API_KEY="..." GEMINI_MODEL="gemini-2.5-flash"` untuk mengisi kredensial server-side.

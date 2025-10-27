@@ -114,11 +114,16 @@ const Status = () => {
         }
 
         const classification = classifyUMKM(income);
-        await supabase.from("umkm_status").upsert({
-          user_id: user.id,
-          level: classification.level,
-          annual_revenue: income,
-        });
+        await supabase
+          .from("umkm_status")
+          .upsert(
+            {
+              user_id: user.id,
+              level: classification.level,
+              annual_revenue: income,
+            },
+            { onConflict: "user_id" },
+          );
       }
 
       setLoading(false);

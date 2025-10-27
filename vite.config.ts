@@ -35,6 +35,14 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,woff2}"],
+        navigateFallback: "/index.html",
+        navigateFallbackAllowlist: [
+          /^\/$/,
+          /^\/(auth|dashboard|transactions|notes|ai-strategy|reports|status|import-export|settings)(\/.*)?$/,
+        ],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/[a-z0-9.-]*supabase\.co\/.*/,
@@ -51,6 +59,7 @@ export default defineConfig(({ mode }) => ({
       },
       devOptions: {
         enabled: mode === "development",
+        navigateFallback: "index.html",
       },
     }),
     mode === "development" && componentTagger(),

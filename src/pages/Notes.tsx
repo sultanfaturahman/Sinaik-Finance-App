@@ -69,8 +69,22 @@ const Notes = () => {
       .order("report_date", { ascending: false });
 
     if (error) {
-      console.error("Failed to fetch financial reports", error);
-      toast.error("Gagal memuat catatan.");
+      const message = (error.message ?? "").toLowerCase();
+      const details = typeof error.details === "string" ? error.details.toLowerCase() : "";
+      const tableMissing =
+        error.code === "PGRST404" ||
+        message.includes("does not exist") ||
+        message.includes("not found") ||
+        details.includes("does not exist") ||
+        details.includes("not found");
+
+      if (!tableMissing) {
+        console.error("Failed to fetch financial reports", error);
+        toast.error("Gagal memuat catatan.");
+      } else {
+        console.warn("financial_reports table belum tersedia");
+        setReports((prev) => ({ ...prev, [frequency]: [] }));
+      }
     } else if (data) {
       const typed = data as FinancialReport[];
       setReports((prev) => ({ ...prev, [frequency]: typed }));
