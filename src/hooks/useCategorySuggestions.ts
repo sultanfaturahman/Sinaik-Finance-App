@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import {
   CATEGORY_SUGGESTIONS_KEY,
   ONBOARDING_COMPLETED_KEY,
@@ -75,17 +77,68 @@ export interface CategorySuggestionState {
 }
 
 export const useCategorySuggestions = (): CategorySuggestionState => {
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+
   const [sectorId, setSectorId] = useState<SectorId | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [ready, setReady] = useState(false);
+  const [syncedUserId, setSyncedUserId] = useState<string | null>(null);
+
+  const getStorageKey = useCallback(
+    (key: string) => (userId ? `${key}:${userId}` : key),
+    [userId]
+  );
+
+  useEffect(() => {
+    setSectorId(null);
+    setSuggestions([]);
+    setOnboardingCompleted(false);
+    setReady(false);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) {
+      setSyncedUserId(null);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId || !isBrowser) return;
+
+    const scopedKeys: Array<[string, string]> = [
+      [SELECTED_SECTOR_KEY, getStorageKey(SELECTED_SECTOR_KEY)],
+      [CATEGORY_SUGGESTIONS_KEY, getStorageKey(CATEGORY_SUGGESTIONS_KEY)],
+      [ONBOARDING_COMPLETED_KEY, getStorageKey(ONBOARDING_COMPLETED_KEY)],
+    ];
+
+    scopedKeys.forEach(([legacyKey, scopedKey]) => {
+      if (window.localStorage.getItem(scopedKey) !== null) return;
+      const legacyValue = window.localStorage.getItem(legacyKey);
+      if (legacyValue !== null) {
+        window.localStorage.setItem(scopedKey, legacyValue);
+        window.localStorage.removeItem(legacyKey);
+      }
+    });
+  }, [getStorageKey, userId]);
 
   const syncFromStorage = useCallback(() => {
-    const savedSector = readStorage<SectorId | null>(SELECTED_SECTOR_KEY, null);
-    const savedSuggestions = readStorage<string[]>(CATEGORY_SUGGESTIONS_KEY, []);
-    const completed = readStorage<boolean>(ONBOARDING_COMPLETED_KEY, false);
+    const savedSector = readStorage<SectorId | null>(
+      getStorageKey(SELECTED_SECTOR_KEY),
+      null
+    );
+    const savedSuggestions = readStorage<string[]>(
+      getStorageKey(CATEGORY_SUGGESTIONS_KEY),
+      []
+    );
+    const completed = readStorage<boolean>(
+      getStorageKey(ONBOARDING_COMPLETED_KEY),
+      false
+    );
 
     setSectorId(savedSector);
+
     if (savedSuggestions.length > 0) {
       setSuggestions(toUniqueList(savedSuggestions));
     } else if (savedSector) {
@@ -96,28 +149,35 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
         );
       }
     }
+
     setOnboardingCompleted(completed);
-    setReady(true);
-  }, []);
+
+    const shouldWaitForRemote = Boolean(userId) && !completed && syncedUserId !== userId;
+    setReady(!shouldWaitForRemote);
+  }, [getStorageKey, syncedUserId, userId]);
 
   useEffect(() => {
     syncFromStorage();
 
     if (!isBrowser) return;
 
+    const relevantKeys = [
+      getStorageKey(SELECTED_SECTOR_KEY),
+      getStorageKey(CATEGORY_SUGGESTIONS_KEY),
+      getStorageKey(ONBOARDING_COMPLETED_KEY),
+    ];
+
     const handleStorage = (event: StorageEvent) => {
-      if (
-        event.key === SELECTED_SECTOR_KEY ||
-        event.key === CATEGORY_SUGGESTIONS_KEY ||
-        event.key === ONBOARDING_COMPLETED_KEY ||
-        event.key === null
-      ) {
+      if (event.key === null || relevantKeys.includes(event.key)) {
         syncFromStorage();
       }
     };
 
-    const handleCustomEvent = () => {
-      syncFromStorage();
+    const handleCustomEvent = (event: Event) => {
+      const detailKey = (event as CustomEvent<{ key: string }>).detail?.key;
+      if (!detailKey || relevantKeys.includes(detailKey)) {
+        syncFromStorage();
+      }
     };
 
     window.addEventListener('storage', handleStorage);
@@ -127,23 +187,119 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener(CATEGORY_EVENT, handleCustomEvent as EventListener);
     };
-  }, [syncFromStorage]);
+  }, [getStorageKey, syncFromStorage]);
+
+  useEffect(() => {
+    if (!userId || syncedUserId === userId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchPreferences = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('onboarding_completed, selected_sector, category_suggestions')
+          .eq('id', userId)
+          .single();
+
+        if (cancelled) return;
+
+        if (error) {
+          console.warn('Failed to fetch onboarding preferences from Supabase', error);
+          setSyncedUserId(userId);
+          setReady(true);
+          return;
+        }
+
+        if (!data) {
+          setSyncedUserId(userId);
+          setReady(true);
+          return;
+        }
+
+        if (typeof data.onboarding_completed === 'boolean') {
+          setOnboardingCompleted(data.onboarding_completed);
+          if (data.onboarding_completed) {
+            writeStorage(getStorageKey(ONBOARDING_COMPLETED_KEY), true);
+          } else {
+            removeStorage(getStorageKey(ONBOARDING_COMPLETED_KEY));
+          }
+        }
+
+        if (data.selected_sector) {
+          setSectorId(data.selected_sector as SectorId);
+          writeStorage(getStorageKey(SELECTED_SECTOR_KEY), data.selected_sector);
+        }
+
+        if (Array.isArray(data.category_suggestions) && data.category_suggestions.length > 0) {
+          const unique = toUniqueList(data.category_suggestions);
+          setSuggestions(unique);
+          writeStorage(getStorageKey(CATEGORY_SUGGESTIONS_KEY), unique);
+        } else if (data.selected_sector) {
+          const preset = SECTOR_PRESETS.find((item) => item.id === data.selected_sector);
+          if (preset) {
+            const presetSuggestions = toUniqueList([
+              ...preset.incomeSuggestions,
+              ...preset.expenseSuggestions,
+            ]);
+            setSuggestions(presetSuggestions);
+            writeStorage(getStorageKey(CATEGORY_SUGGESTIONS_KEY), presetSuggestions);
+          }
+        }
+
+        setSyncedUserId(userId);
+        setReady(true);
+      } catch (error) {
+        if (!cancelled) {
+          console.warn('Failed to fetch onboarding preferences from Supabase', error);
+          setSyncedUserId(userId);
+          setReady(true);
+        }
+      }
+    };
+
+    fetchPreferences();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [getStorageKey, syncedUserId, userId]);
 
   const sector = useMemo(
     () => SECTOR_PRESETS.find((item) => item.id === sectorId) ?? null,
     [sectorId]
   );
 
-  const persistSuggestions = useCallback((items: string[]) => {
-    const unique = toUniqueList(items);
-    setSuggestions(unique);
-    writeStorage(CATEGORY_SUGGESTIONS_KEY, unique);
-  }, []);
+  const persistSuggestions = useCallback(
+    (items: string[]) => {
+      const unique = toUniqueList(items);
+      setSuggestions(unique);
+      writeStorage(getStorageKey(CATEGORY_SUGGESTIONS_KEY), unique);
+
+      if (userId) {
+        void supabase
+          .from('profiles')
+          .update({ category_suggestions: unique })
+          .eq('id', userId);
+      }
+    },
+    [getStorageKey, userId]
+  );
 
   const setSector = useCallback(
     (id: SectorId) => {
       setSectorId(id);
-      writeStorage(SELECTED_SECTOR_KEY, id);
+      writeStorage(getStorageKey(SELECTED_SECTOR_KEY), id);
+
+      if (userId) {
+        void supabase
+          .from('profiles')
+          .update({ selected_sector: id })
+          .eq('id', userId);
+      }
+
       const preset = SECTOR_PRESETS.find((item) => item.id === id);
       if (preset) {
         persistSuggestions([
@@ -152,19 +308,31 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
         ]);
       }
     },
-    [persistSuggestions]
+    [getStorageKey, persistSuggestions, userId]
   );
 
   const completeOnboarding = useCallback(
     (customCategories?: string[]) => {
       setOnboardingCompleted(true);
-      writeStorage(ONBOARDING_COMPLETED_KEY, true);
+      writeStorage(getStorageKey(ONBOARDING_COMPLETED_KEY), true);
 
       if (customCategories && customCategories.length > 0) {
         persistSuggestions(customCategories);
       }
+
+      if (userId) {
+        const payload: { onboarding_completed: boolean; selected_sector?: string | null } = {
+          onboarding_completed: true,
+        };
+
+        if (sectorId) {
+          payload.selected_sector = sectorId;
+        }
+
+        void supabase.from('profiles').update(payload).eq('id', userId);
+      }
     },
-    [persistSuggestions]
+    [getStorageKey, persistSuggestions, sectorId, userId]
   );
 
   const addSuggestion = useCallback(
@@ -187,7 +355,9 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
 
   const removeSuggestion = useCallback(
     (category: string) => {
-      const updated = suggestions.filter((item) => item.toLowerCase() !== category.toLowerCase());
+      const updated = suggestions.filter(
+        (item) => item.toLowerCase() !== category.toLowerCase()
+      );
       persistSuggestions(updated);
     },
     [persistSuggestions, suggestions]
@@ -197,10 +367,21 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
     setOnboardingCompleted(false);
     setSectorId(null);
     setSuggestions([]);
-    removeStorage(ONBOARDING_COMPLETED_KEY);
-    removeStorage(SELECTED_SECTOR_KEY);
-    removeStorage(CATEGORY_SUGGESTIONS_KEY);
-  }, []);
+    removeStorage(getStorageKey(ONBOARDING_COMPLETED_KEY));
+    removeStorage(getStorageKey(SELECTED_SECTOR_KEY));
+    removeStorage(getStorageKey(CATEGORY_SUGGESTIONS_KEY));
+
+    if (userId) {
+      void supabase
+        .from('profiles')
+        .update({
+          onboarding_completed: false,
+          selected_sector: null,
+          category_suggestions: [],
+        })
+        .eq('id', userId);
+    }
+  }, [getStorageKey, userId]);
 
   return {
     sector,

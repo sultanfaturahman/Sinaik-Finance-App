@@ -28,6 +28,9 @@ import { useCategorySuggestions } from '@/hooks/useCategorySuggestions';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TransactionTable } from '@/components/transactions/TransactionTable';
 import { TransactionItemCard } from '@/components/transactions/TransactionItemCard';
+import { TemplateList } from '@/components/transactions/TemplateList';
+import { BulkOperationsToolbar } from '@/components/transactions/BulkOperationsToolbar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Transaction } from '@/types/transaction';
 
 const Transactions = () => {
@@ -39,6 +42,7 @@ const Transactions = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false);
   const [newSuggestion, setNewSuggestion] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { suggestions, addSuggestion, bulkAddSuggestions, removeSuggestion } = useCategorySuggestions();
   const isMobile = useIsMobile();
@@ -68,6 +72,7 @@ const Transactions = () => {
     } else if (data) {
       setTransactions(data as Transaction[]);
       bulkAddSuggestions(data.map((transaction) => transaction.category));
+      setSelectedIds(new Set());
     }
 
     setLoading(false);
@@ -158,6 +163,30 @@ const Transactions = () => {
     fetchTransactions();
   };
 
+  const toggleSelect = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (checked) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+  };
+
+  const toggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(transactions.map((transaction) => transaction.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
   const resetForm = () => {
     setFormData({
       type: 'income',
@@ -185,102 +214,126 @@ const Transactions = () => {
       subtitle="Kelola pemasukan dan pengeluaran harian Anda"
       bottomAction={bottomAction}
     >
-      <div className="flex min-w-0 flex-col gap-6">
-        <Section
-          title="Catatan Harian / Bulanan"
-          description="Ringkasan cepat kini dipindahkan ke modul Catatan agar tidak bercampur dengan transaksi manual atau impor."
-          actions={
-            <Button asChild variant="outline" className="gap-2">
-              <Link to="/notes">
-                <NotebookPen className="h-4 w-4" />
-                <span>Buka Modul Catatan</span>
-              </Link>
-            </Button>
-          }
-        >
-          <Alert className="border-dashed border-brand/30 bg-brand/5">
-            <Info className="h-4 w-4 text-brand" />
-            <AlertDescription className="text-sm text-muted-foreground">
-              Gunakan tombol di atas untuk menyimpan ringkasan pemasukan/pengeluaran tanpa mengganggu transaksi.
-            </AlertDescription>
-          </Alert>
-        </Section>
+      <Tabs defaultValue="transactions" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="transactions">Daftar Transaksi</TabsTrigger>
+          <TabsTrigger value="templates">Template</TabsTrigger>
+        </TabsList>
 
-        <Section
-          title="Aksi Cepat"
-          description="Gunakan import untuk upload massal atau export untuk backup laporan."
-          actions={
-            <div className="grid grid-cols-1 gap-2 md:flex md:items-center">
-              <ExcelExport className="w-full md:w-auto" />
-              <ExcelImport
-                onImportComplete={fetchTransactions}
-                onCategoriesImported={bulkAddSuggestions}
-              />
-            </div>
-          }
-        >
-          <Alert className="border-primary/20 bg-primary/5">
-            <Info className="h-4 w-4 text-primary" />
-            <AlertDescription className="text-sm text-muted-foreground">
-              <strong>Tips:</strong> Sistem otomatis mendeteksi duplikat berdasarkan tanggal, jenis,
-              kategori, dan jumlah yang sama.
-            </AlertDescription>
-          </Alert>
-        </Section>
-
-        <Section title="Daftar Transaksi">
-          {loading ? (
-            <ListSkeleton rows={5} columns={7} />
-          ) : error ? (
-            <ErrorState
-              description={error}
-              action={
-                <Button onClick={fetchTransactions} className="w-full md:w-auto">
-                  Coba Lagi
+        <TabsContent value="transactions" className="space-y-6">
+          <div className="flex min-w-0 flex-col gap-6">
+            <Section
+              title="Catatan Harian / Bulanan"
+              description="Ringkasan cepat kini dipindahkan ke modul Catatan agar tidak bercampur dengan transaksi manual atau impor."
+              actions={
+                <Button asChild variant="outline" className="gap-2">
+                  <Link to="/notes">
+                    <NotebookPen className="h-4 w-4" />
+                    <span>Buka Modul Catatan</span>
+                  </Link>
                 </Button>
               }
-            />
-          ) : transactions.length === 0 ? (
-            <EmptyState
-              icon={<Info className="h-5 w-5" />}
-              title="Belum ada transaksi"
-              description="Tambahkan transaksi manual atau import dari Excel untuk mulai memantau arus kas."
-              action={
-                <>
-                  <Button onClick={() => setDialogOpen(true)} className="w-full">
-                    Tambah Manual
-                  </Button>
+            >
+              <Alert className="border-dashed border-brand/30 bg-brand/5">
+                <Info className="h-4 w-4 text-brand" />
+                <AlertDescription className="text-sm text-muted-foreground">
+                  Gunakan tombol di atas untuk menyimpan ringkasan pemasukan/pengeluaran tanpa mengganggu transaksi.
+                </AlertDescription>
+              </Alert>
+            </Section>
+
+            <Section
+              title="Aksi Cepat"
+              description="Gunakan import untuk upload massal atau export untuk backup laporan."
+              actions={
+                <div className="grid grid-cols-1 gap-2 md:flex md:items-center">
+                  <ExcelExport className="w-full md:w-auto" />
                   <ExcelImport
                     onImportComplete={fetchTransactions}
                     onCategoriesImported={bulkAddSuggestions}
                   />
-                </>
+                </div>
               }
-            />
-          ) : (
-            <>
-              {isMobile ? (
-                <div className="space-y-3">
-                  {transactions.map((transaction) => (
-                    <TransactionItemCard
-                      key={transaction.id}
-                      transaction={transaction}
+            >
+              <Alert className="border-primary/20 bg-primary/5">
+                <Info className="h-4 w-4 text-primary" />
+                <AlertDescription className="text-sm text-muted-foreground">
+                  <strong>Tips:</strong> Sistem otomatis mendeteksi duplikat berdasarkan tanggal, jenis,
+                  kategori, dan jumlah yang sama.
+                </AlertDescription>
+              </Alert>
+            </Section>
+
+            <Section title="Daftar Transaksi">
+              {loading ? (
+                <ListSkeleton rows={5} columns={7} />
+              ) : error ? (
+                <ErrorState
+                  description={error}
+                  action={
+                    <Button onClick={fetchTransactions} className="w-full md:w-auto">
+                      Coba Lagi
+                    </Button>
+                  }
+                />
+              ) : transactions.length === 0 ? (
+                <EmptyState
+                  icon={<Info className="h-5 w-5" />}
+                  title="Belum ada transaksi"
+                  description="Tambahkan transaksi manual atau import dari Excel untuk mulai memantau arus kas."
+                  action={
+                    <>
+                      <Button onClick={() => setDialogOpen(true)} className="w-full">
+                        Tambah Manual
+                      </Button>
+                      <ExcelImport
+                        onImportComplete={fetchTransactions}
+                        onCategoriesImported={bulkAddSuggestions}
+                      />
+                    </>
+                  }
+                />
+              ) : (
+                <>
+                  <BulkOperationsToolbar
+                    selectedIds={selectedIds}
+                    availableCategories={suggestions}
+                    onClearSelection={clearSelection}
+                    onActionComplete={fetchTransactions}
+                  />
+                  {isMobile ? (
+                    <div className="space-y-3">
+                      {transactions.map((transaction) => (
+                        <TransactionItemCard
+                          key={transaction.id}
+                          transaction={transaction}
+                          selected={selectedIds.has(transaction.id)}
+                          onToggleSelect={toggleSelect}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <TransactionTable
+                      data={transactions}
+                      selectedIds={selectedIds}
+                      onToggleSelect={toggleSelect}
+                      onToggleSelectAll={toggleSelectAll}
                       onEdit={handleEdit}
                       onDelete={handleDelete}
                     />
-                  ))}
-                </div>
-              ) : (
-                <TransactionTable
-                  data={transactions}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
+                  )}
+                </>
               )}
-            </>
-          )}
-        </Section>
-      </div>
+            </Section>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="templates">
+          <TemplateList onTransactionCreated={fetchTransactions} />
+        </TabsContent>
+      </Tabs>
 
       <TransactionDialog
         open={dialogOpen}

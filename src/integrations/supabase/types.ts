@@ -92,23 +92,32 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string | null
+          category_suggestions: string[]
           email: string
           id: string
           name: string
+          onboarding_completed: boolean
+          selected_sector: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          category_suggestions?: string[]
           email: string
           id: string
           name: string
+          onboarding_completed?: boolean
+          selected_sector?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          category_suggestions?: string[]
           email?: string
           id?: string
           name?: string
+          onboarding_completed?: boolean
+          selected_sector?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -152,6 +161,51 @@ export type Database = {
           user_id?: string
           income_category?: string | null
           expense_category?: string | null
+        }
+        Relationships: []
+      }
+      transaction_templates: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_recurring: boolean
+          name: string
+          next_occurrence: string | null
+          recurring_frequency: Database["public"]["Enums"]["transaction_recurring_frequency"] | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_recurring?: boolean
+          name: string
+          next_occurrence?: string | null
+          recurring_frequency?: Database["public"]["Enums"]["transaction_recurring_frequency"] | null
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_recurring?: boolean
+          name?: string
+          next_occurrence?: string | null
+          recurring_frequency?: Database["public"]["Enums"]["transaction_recurring_frequency"] | null
+          type?: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -256,6 +310,7 @@ export type Database = {
       app_role: "admin" | "owner" | "cashier"
       transaction_source: "pwa" | "excel" | "manual"
       transaction_type: "income" | "expense"
+      transaction_recurring_frequency: "daily" | "weekly" | "monthly" | "yearly"
       umkm_level: "ultra_mikro" | "super_mikro" | "mikro" | "kecil"
     }
     CompositeTypes: {
@@ -387,6 +442,7 @@ export const Constants = {
       app_role: ["admin", "owner", "cashier"],
       transaction_source: ["pwa", "excel", "manual"],
       transaction_type: ["income", "expense"],
+      transaction_recurring_frequency: ["daily", "weekly", "monthly", "yearly"],
       report_frequency: ["daily", "monthly"],
       umkm_level: ["ultra_mikro", "super_mikro", "mikro", "kecil"],
     },

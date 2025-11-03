@@ -550,7 +550,7 @@ serve(async (req) => {
       geminiData?.candidates?.[0]?.output ??
       "";
 
-    let rawStrategy = rawCandidate ? sanitizeJsonContent(rawCandidate) : "";
+    const rawStrategy = rawCandidate ? sanitizeJsonContent(rawCandidate) : "";
     let parsedStrategy: unknown = null;
     try {
       parsedStrategy = rawStrategy ? JSON.parse(rawStrategy) : null;

@@ -105,7 +105,7 @@ const Reports = () => {
     };
 
     fetchReports();
-  }, [user?.id]);
+  }, [user]);
 
   const years = useMemo(
     () => Array.from(new Set(monthlyReports.map((report) => report.year))).sort((a, b) => b - a),

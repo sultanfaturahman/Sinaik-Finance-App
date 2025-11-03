@@ -130,7 +130,7 @@ const Status = () => {
     };
 
     fetchRevenue();
-  }, [user?.id]);
+  }, [user]);
 
   if (loading) {
     return (
