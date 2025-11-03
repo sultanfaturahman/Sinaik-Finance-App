@@ -200,7 +200,7 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('onboarding_completed, selected_sector, category_suggestions')
+          .select('onboarding_completed, selected_sector, category_suggestions, profile_completed')
           .eq('id', userId)
           .single();
 
@@ -219,13 +219,13 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
           return;
         }
 
-        if (typeof data.onboarding_completed === 'boolean') {
-          setOnboardingCompleted(data.onboarding_completed);
-          if (data.onboarding_completed) {
-            writeStorage(getStorageKey(ONBOARDING_COMPLETED_KEY), true);
-          } else {
-            removeStorage(getStorageKey(ONBOARDING_COMPLETED_KEY));
-          }
+        const onboardingFlag = Boolean(data.onboarding_completed || data.profile_completed);
+
+        setOnboardingCompleted(onboardingFlag);
+        if (onboardingFlag) {
+          writeStorage(getStorageKey(ONBOARDING_COMPLETED_KEY), true);
+        } else {
+          removeStorage(getStorageKey(ONBOARDING_COMPLETED_KEY));
         }
 
         if (data.selected_sector) {

@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import ImportExport from "./pages/ImportExport";
 import Settings from "./pages/Settings";
 import Notes from "./pages/Notes";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+           
             <Route
               path="/import-export"
               element={
@@ -89,6 +91,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              }
+            /> 
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />

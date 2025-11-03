@@ -89,9 +89,7 @@ const MobileSidebar = ({ openMobile, onOpenChange }: SidebarDrawerProps) => (
 
 const Brand = () => (
   <div className="flex items-center gap-3">
-    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground text-base font-bold shadow-sm">
-      Si
-    </div>
+    <img src="/sinaik_logo_1.png" alt="SiNaik" className="h-10 w-10 rounded-xl object-contain shadow-sm" />
     <div className="space-y-0.5">
       <p className="text-base font-semibold text-foreground">SiNaik</p>
       <p className="text-xs text-muted-foreground">Sistem Informasi Naik Kelas</p>

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
+import { SignOutButton } from "@/components/SignOutButton";
 
 const Settings = () => {
   const { resolvedTheme, setTheme } = useTheme();
@@ -83,6 +84,21 @@ const Settings = () => {
             </Button>
           </div>
         </Section>
+
+        <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Keluar dari akun</p>
+              <p className="text-xs text-muted-foreground">Akhiri sesi Anda di perangkat ini.</p>
+            </div>
+            <SignOutButton
+              label="Keluar"
+              buttonVariant="destructive"
+              className="w-full justify-center md:w-auto"
+              iconClassName="text-destructive-foreground"
+            />
+          </div>
+        </div>
       </div>
     </AppShell>
   );

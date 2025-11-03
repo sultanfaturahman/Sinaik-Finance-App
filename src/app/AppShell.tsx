@@ -2,9 +2,6 @@ import { ReactNode, useMemo, useState } from "react";
 import { SidebarDrawer } from "@/components/layout/SidebarDrawer";
 import { Topbar } from "@/components/layout/Topbar";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 
 interface AppShellProps {
   title: string;
@@ -22,25 +19,8 @@ export const AppShell = ({
   children,
 }: AppShellProps) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const { signOut } = useAuth();
 
-  const topbarActions = useMemo(
-    () => (
-      <>
-        {headerActions}
-        <Button
-          variant="ghost"
-          className="gap-2 text-muted-foreground hover:text-foreground"
-          onClick={signOut}
-          aria-label="Keluar dari aplikasi"
-        >
-          <LogOut className="h-4 w-4" />
-          <span>Keluar</span>
-        </Button>
-      </>
-    ),
-    [headerActions, signOut]
-  );
+  const topbarActions = useMemo(() => headerActions, [headerActions]);
 
   return (
     <div className="relative flex min-h-screen w-full bg-muted/20">

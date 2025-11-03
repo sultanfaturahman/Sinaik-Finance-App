@@ -8,6 +8,7 @@ import {
   Settings,
   NotebookPen,
   Sparkles,
+  UserCircle,
 } from "lucide-react";
 
 export interface AppRoute {
@@ -46,6 +47,7 @@ export const APP_ROUTES: AppRoute[] = [
     icon: Sparkles,
     showInSidebar: true,
   },
+ 
   {
     path: "/import-export",
     label: "Import / Export",
@@ -69,6 +71,12 @@ export const APP_ROUTES: AppRoute[] = [
     path: "/settings",
     label: "Settings",
     icon: Settings,
+    showInSidebar: true,
+  }, 
+  {
+    path: "/profile",
+    label: "Profil",
+    icon: UserCircle,
     showInSidebar: true,
   },
 ];

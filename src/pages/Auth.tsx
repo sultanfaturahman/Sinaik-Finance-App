@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { TrendingUp } from 'lucide-react';
 import { z } from 'zod';
 
 const emailSchema = z.string().email('Email tidak valid');
@@ -100,10 +99,7 @@ const Auth = () => {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
       <Card className="w-full max-w-sm shadow-lg">
         <CardHeader className="text-center space-y-2">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent text-primary-foreground mb-2">
-            <TrendingUp className="h-8 w-8" />
-          </div>
-          <CardTitle className="text-2xl font-bold">SiNaik</CardTitle>
+          <img src="/sinaik_logo_1.png" alt="SiNaik" className="mx-auto mb-2 h-16 w-16 object-contain" />
           <CardDescription className="text-sm">
             Bersama Naik Kelas, UMKM Tumbuh Berkualitas
           </CardDescription>

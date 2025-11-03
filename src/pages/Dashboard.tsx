@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useCategorySuggestions } from "@/hooks/useCategorySuggestions";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { SignOutButton } from "@/components/SignOutButton";
 
 interface DashboardStats {
   totalIncome: number;
@@ -104,7 +105,19 @@ const Dashboard = () => {
   ];
 
   return (
-    <AppShell title="Dashboard" subtitle="Ringkasan terkini performa usaha Anda">
+    <AppShell
+      title="Dashboard"
+      subtitle="Ringkasan terkini performa usaha Anda"
+      headerActions={
+        <SignOutButton
+          iconOnly
+          buttonVariant="ghost"
+          aria-label="Keluar dari akun"
+          iconClassName="text-muted-foreground"
+          className="text-muted-foreground hover:text-destructive"
+        />
+      }
+    >
       <OnboardingWizard
         open={showOnboarding}
         onOpenChange={setShowOnboarding}

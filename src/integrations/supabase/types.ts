@@ -93,30 +93,48 @@ export type Database = {
         Row: {
           created_at: string | null
           category_suggestions: string[]
+          business_name: string | null
+          business_type: string | null
+          city: string | null
           email: string
           id: string
           name: string
           onboarding_completed: boolean
+          phone: string | null
+          profile_completed: boolean
+          profile_completed_at: string | null
           selected_sector: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           category_suggestions?: string[]
+          business_name?: string | null
+          business_type?: string | null
+          city?: string | null
           email: string
           id: string
           name: string
           onboarding_completed?: boolean
+          phone?: string | null
+          profile_completed?: boolean
+          profile_completed_at?: string | null
           selected_sector?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           category_suggestions?: string[]
+          business_name?: string | null
+          business_type?: string | null
+          city?: string | null
           email?: string
           id?: string
           name?: string
           onboarding_completed?: boolean
+          phone?: string | null
+          profile_completed?: boolean
+          profile_completed_at?: string | null
           selected_sector?: string | null
           updated_at?: string | null
         }
