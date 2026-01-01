@@ -264,7 +264,17 @@ const Transactions = () => {
               </Alert>
             </Section>
 
-            <Section title="Daftar Transaksi">
+            <Section
+              title="Daftar Transaksi"
+              actions={
+                !isMobile && (
+                  <Button onClick={() => setDialogOpen(true)} className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    <span>Tambah Transaksi</span>
+                  </Button>
+                )
+              }
+            >
               {loading ? (
                 <ListSkeleton rows={5} columns={7} />
               ) : error ? (

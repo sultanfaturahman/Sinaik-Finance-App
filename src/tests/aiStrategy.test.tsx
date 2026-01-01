@@ -1,10 +1,16 @@
+import type { ReactNode } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import AIStrategy from '@/pages/AIStrategy';
 
 const invokeMock = vi.hoisted(() => vi.fn());
 const getSessionMock = vi.hoisted(() => vi.fn());
+const fromMock = vi.hoisted(() => vi.fn());
+const selectMock = vi.hoisted(() => vi.fn());
+const eqMock = vi.hoisted(() => vi.fn());
+const maybeSingleMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
@@ -14,11 +20,21 @@ vi.mock('@/integrations/supabase/client', () => ({
     auth: {
       getSession: getSessionMock,
     },
+    from: fromMock,
   },
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 'user-1' }, session: null, loading: false, signOut: vi.fn() }),
+}));
+
+vi.mock('@/app/AppShell', () => ({
+  AppShell: ({ children }: { children: ReactNode }) => <div data-testid="app-shell">{children}</div>,
+}));
+
+vi.mock('react-markdown', () => ({
+  __esModule: true,
+  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
 vi.mock('@/hooks/useFinancialSnapshot', () => ({
@@ -43,13 +59,42 @@ vi.mock('@/hooks/useFinancialSnapshot', () => ({
   }),
 }));
 
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 describe('AI Strategy page', () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
     vi.clearAllMocks();
     invokeMock.mockReset();
     getSessionMock.mockReset();
+    fromMock.mockReset();
+    selectMock.mockReset();
+    eqMock.mockReset();
+    maybeSingleMock.mockReset();
 
     getSessionMock.mockResolvedValue({ data: { session: { access_token: 'token-123' } } });
+
+    fromMock.mockReturnValue({ select: selectMock });
+    selectMock.mockReturnValue({ eq: eqMock });
+    eqMock.mockReturnValue({ maybeSingle: maybeSingleMock });
+    maybeSingleMock.mockResolvedValue({
+      data: {
+        id: 'user-1',
+        business_name: 'SiNaik Mart',
+        name: 'Owner',
+        email: 'owner@example.com',
+      },
+      error: null,
+    });
 
     invokeMock.mockResolvedValue({
       data: {
@@ -85,9 +130,11 @@ describe('AI Strategy page', () => {
 
   it('generates strategy and renders summary & action list', async () => {
     render(
-      <MemoryRouter>
-        <AIStrategy />
-      </MemoryRouter>,
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <AIStrategy />
+        </MemoryRouter>
+      </QueryClientProvider>,
     );
 
     const button = screen.getByRole('button', { name: /hasilkan strategi bisnis/i });

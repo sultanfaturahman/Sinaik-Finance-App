@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import Transactions from '@/pages/Transactions';
 
 const sampleTransactions = [
@@ -46,17 +47,24 @@ vi.mock('@/hooks/useCategorySuggestions', () => ({
   }),
 }));
 
-const renderTransactions = async () => {
+const renderTransactions = async (client: QueryClient) => {
   render(
-    <MemoryRouter>
-      <Transactions />
-    </MemoryRouter>
+    <QueryClientProvider client={client}>
+      <MemoryRouter>
+        <Transactions />
+      </MemoryRouter>
+    </QueryClientProvider>
   );
   await waitFor(() => expect(orderMock).toHaveBeenCalled());
 };
 
 describe('Transactions responsive layout', () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
     vi.clearAllMocks();
     localStorage.clear();
   });
@@ -65,7 +73,7 @@ describe('Transactions responsive layout', () => {
     window.innerWidth = 390;
     window.dispatchEvent(new Event('resize'));
 
-    await renderTransactions();
+    await renderTransactions(queryClient);
 
     await waitFor(() => expect(screen.getByText(/Penjualan Online/i)).toBeInTheDocument());
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
@@ -75,7 +83,7 @@ describe('Transactions responsive layout', () => {
     window.innerWidth = 1024;
     window.dispatchEvent(new Event('resize'));
 
-    await renderTransactions();
+    await renderTransactions(queryClient);
 
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
   });

@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { vi } from 'vitest';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { vi } from 'vitest';
 import Dashboard from '@/pages/Dashboard';
 
 const orderMock = vi.fn().mockResolvedValue({
@@ -38,15 +39,22 @@ vi.mock('@/hooks/useCategorySuggestions', () => ({
 }));
 
 describe('Dashboard responsive grid', () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
     vi.clearAllMocks();
   });
 
   it('renders stat cards grid with responsive classes', async () => {
     render(
-      <MemoryRouter>
-        <Dashboard />
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <Dashboard />
+        </MemoryRouter>
+      </QueryClientProvider>
     );
 
     await waitFor(() => expect(screen.getByTestId('stats-grid')).toBeInTheDocument());

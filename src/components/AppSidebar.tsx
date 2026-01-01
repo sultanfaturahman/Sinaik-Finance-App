@@ -10,8 +10,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-  useSidebar,
 } from '@/components/ui/sidebar';
+import { useSidebar } from '@/components/ui/sidebar-context';
 
 const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: Home },
@@ -28,16 +28,16 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarHeader className="border-b border-border p-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <img
-            src="/sinaik_logo_1.png"
+            src="/sinaik_logo_1 1 (1).png"
             alt="SiNaik"
-            className="h-8 w-8 rounded-md object-contain"
+            className="h-12 w-12 rounded-xl object-contain"
           />
           {!isCollapsed && (
             <div>
-              <h2 className="text-sm font-bold text-foreground">SiNaik</h2>
-              <p className="text-xs text-muted-foreground">UMKM Tracker</p>
+              <h2 className="text-lg font-bold text-foreground">SiNaik</h2>
+              <p className="text-sm text-muted-foreground">UMKM Tracker</p>
             </div>
           )}
         </div>

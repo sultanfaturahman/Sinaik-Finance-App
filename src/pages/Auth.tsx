@@ -98,8 +98,8 @@ const Auth = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
       <Card className="w-full max-w-sm shadow-lg">
-        <CardHeader className="text-center space-y-2">
-          <img src="/sinaik_logo_1.png" alt="SiNaik" className="mx-auto mb-2 h-16 w-16 object-contain" />
+        <CardHeader className="text-center space-y-3">
+          <img src="/sinaik_logo_1 1 (1).png" alt="SiNaik" className="mx-auto h-20 w-20 object-contain" />
           <CardDescription className="text-sm">
             Bersama Naik Kelas, UMKM Tumbuh Berkualitas
           </CardDescription>

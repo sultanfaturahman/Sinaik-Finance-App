@@ -3,6 +3,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { APP_ROUTES } from "@/app/routes";
+import { useProfile } from "@/hooks/useProfile";
 
 export interface SidebarDrawerProps {
   openMobile: boolean;
@@ -87,15 +88,27 @@ const MobileSidebar = ({ openMobile, onOpenChange }: SidebarDrawerProps) => (
   </Sheet>
 );
 
-const Brand = () => (
-  <div className="flex items-center gap-3">
-    <img src="/sinaik_logo_1.png" alt="SiNaik" className="h-10 w-10 rounded-xl object-contain shadow-sm" />
-    <div className="space-y-0.5">
-      <p className="text-base font-semibold text-foreground">SiNaik</p>
-      <p className="text-xs text-muted-foreground">Sistem Informasi Naik Kelas</p>
+const Brand = () => {
+  const { data: profile } = useProfile();
+  const businessName =
+    profile?.business_name?.trim() ||
+    profile?.name?.trim() ||
+    "UMKM Anda";
+
+  return (
+    <div className="flex items-center gap-4">
+      <img
+        src="/sinaik_logo_1 1 (1).png"
+        alt="SiNaik"
+        className="h-14 w-14 rounded-1xl object-contain"
+      />
+      <div className="space-y-1">
+        <p className="text-lg font-semibold text-foreground">SiNaik</p>
+        <p className="text-sm text-muted-foreground">halo, {businessName}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const FooterNote = ({ className }: { className?: string }) => (
   <div className={cn("rounded-xl border border-dashed border-border/80 p-3 text-xs text-muted-foreground", className)}>
