@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { TrendingUp, TrendingDown, Wallet, Receipt } from "lucide-react";
 import { getSupabaseClient } from "@/integrations/supabase/client";
@@ -6,11 +6,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/app/AppShell";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { Section } from "@/components/ui/Section";
-import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useCategorySuggestions } from "@/hooks/useCategorySuggestions";
-import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { SignOutButton } from "@/components/SignOutButton";
+import { Skeleton } from "@/components/ui/skeleton";
+const OnboardingWizard = lazy(() => import("@/components/OnboardingWizard"));
 
 interface DashboardStats {
   totalIncome: number;
@@ -137,11 +137,15 @@ const Dashboard = () => {
         />
       }
     >
-      <OnboardingWizard
-        open={showOnboarding}
-        onOpenChange={setShowOnboarding}
-        onCompleted={() => setShowOnboarding(false)}
-      />
+      {showOnboarding && (
+        <Suspense fallback={<OnboardingWizardFallback />}>
+          <OnboardingWizard
+            open={showOnboarding}
+            onOpenChange={setShowOnboarding}
+            onCompleted={() => setShowOnboarding(false)}
+          />
+        </Suspense>
+      )}
 
       {loading ? (
         <DashboardSkeleton />
@@ -207,5 +211,18 @@ const DashboardSkeleton = () => (
   </div>
 );
 
-export default Dashboard;
+const OnboardingWizardFallback = () => (
+  <div className="rounded-2xl border border-dashed border-border/70 bg-background p-6">
+    <div className="mb-4 space-y-2">
+      <Skeleton className="h-6 w-1/3" />
+      <Skeleton className="h-4 w-2/3" />
+    </div>
+    <div className="grid gap-3 md:grid-cols-2">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <Skeleton key={`wizard-skeleton-${index}`} className="h-20 rounded-xl" />
+      ))}
+    </div>
+  </div>
+);
 
+export default Dashboard;
