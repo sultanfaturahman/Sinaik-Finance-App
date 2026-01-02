@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Upload, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
+import { loadXlsx } from '@/lib/loadXlsx';
 
 interface ExcelRow {
   tanggal: string;
@@ -59,9 +59,9 @@ export const ExcelImport = ({
 
     return data && data.length > 0;
   };
-
   const parseExcelFile = async (file: File) => {
     try {
+      const XLSX = await loadXlsx();
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       const sheetName = workbook.SheetNames[0];
@@ -85,15 +85,18 @@ export const ExcelImport = ({
           error = 'Tanggal tidak boleh kosong';
         } else {
           // Try to parse date in various formats
-          let dateObj: Date;
+          let dateObj: Date | null = null;
           if (typeof row.tanggal === 'number') {
             // Excel serial date
-            dateObj = XLSX.SSF.parse_date_code(row.tanggal);
+            const parsed = XLSX.SSF.parse_date_code(row.tanggal);
+            if (parsed) {
+              dateObj = new Date(parsed.y, parsed.m - 1, parsed.d);
+            }
           } else {
             dateObj = new Date(row.tanggal);
           }
-          
-          if (isNaN(dateObj.getTime())) {
+
+          if (!dateObj || isNaN(dateObj.getTime())) {
             error = 'Format tanggal tidak valid';
           } else {
             transaction.date = dateObj.toISOString().split('T')[0];

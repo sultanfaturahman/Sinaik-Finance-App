@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
+import { loadXlsx } from '@/lib/loadXlsx';
 
 export const ExcelExport = ({ className, ...buttonProps }: ButtonProps) => {
   const { user } = useAuth();
@@ -12,6 +12,7 @@ export const ExcelExport = ({ className, ...buttonProps }: ButtonProps) => {
     if (!user) return;
 
     try {
+      const XLSX = await loadXlsx();
       const { data: transactions, error } = await supabase
         .from('transactions')
         .select('date, type, category, amount, note, source')
