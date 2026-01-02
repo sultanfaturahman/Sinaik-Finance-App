@@ -19,8 +19,16 @@ interface DashboardStats {
   transactionCount: number;
 }
 
+interface DashboardStatsRow {
+  total_income: number | null;
+  total_expense: number | null;
+  net_profit: number | null;
+  transaction_count: number | null;
+}
+
 const Dashboard = () => {
   const { user } = useAuth();
+  const userId = user?.id;
   const { onboardingCompleted, ready: onboardingReady } = useCategorySuggestions();
   const [stats, setStats] = useState<DashboardStats>({
     totalIncome: 0,
@@ -32,36 +40,46 @@ const Dashboard = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
+    let active = true;
+
     const fetchStats = async () => {
-      if (!user) return;
+      if (!userId || !active) return;
 
-      const supabase = await getSupabaseClient();
-      const { data: transactions } = await supabase
-        .from("transactions")
-        .select("type, amount")
-        .eq("user_id", user.id);
+      setLoading(true);
 
-      if (transactions) {
-        const income = transactions
-          .filter((t) => t.type === "income")
-          .reduce((sum, t) => sum + Number(t.amount), 0);
+      try {
+        const supabase = await getSupabaseClient();
+        const { data, error } = await supabase.rpc<DashboardStatsRow>("get_dashboard_stats");
 
-        const expense = transactions
-          .filter((t) => t.type === "expense")
-          .reduce((sum, t) => sum + Number(t.amount), 0);
+        if (error) {
+          throw error;
+        }
+
+        const statsRow = Array.isArray(data) ? data[0] : data;
+
+        if (!active) return;
 
         setStats({
-          totalIncome: income,
-          totalExpense: expense,
-          netProfit: income - expense,
-          transactionCount: transactions.length,
+          totalIncome: Number(statsRow?.total_income ?? 0),
+          totalExpense: Number(statsRow?.total_expense ?? 0),
+          netProfit: Number(statsRow?.net_profit ?? 0),
+          transactionCount: Number(statsRow?.transaction_count ?? 0),
         });
+      } catch (err) {
+        console.error("Failed to fetch dashboard stats", err);
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
     };
 
-    fetchStats();
-  }, [user]);
+    void fetchStats();
+
+    return () => {
+      active = false;
+    };
+  }, [userId]);
 
   useEffect(() => {
     if (!onboardingReady) return;
