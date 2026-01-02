@@ -1,22 +1,16 @@
+import { useEffect, ReactNode } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { Navigate, useLocation } from "react-router-dom";
-import { ReactNode } from "react";
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const location = useLocation();
   const { user, loading } = useAuth();
-  const {
-    data: profile,
-    isLoading: profileLoading,
-    error: profileError,
-  } = useProfile();
 
-  if (loading || profileLoading) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="text-center">
@@ -26,36 +20,54 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       </div>
     );
   }
-
-  if (profileError) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="space-y-2 text-center">
-          <p className="text-base font-semibold text-foreground">Gagal memuat profil.</p>
-          <p className="text-sm text-muted-foreground">Silakan segarkan halaman atau coba lagi nanti.</p>
-        </div>
-      </div>
-    );
-  }
-
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
 
-  if (profile && !profile.profile_completed && !location.pathname.startsWith("/profile")) {
-    const destination = {
-      pathname: "/profile",
-      search: "?setup=1",
-    };
+  return <ProfileRedirectBoundary>{children}</ProfileRedirectBoundary>;
+};
 
-    return (
-      <Navigate
-        to={destination}
-        state={{ from: `${location.pathname}${location.search}` }}
-        replace
-      />
-    );
-  }
+const ProfileRedirectBoundary = ({ children }: { children: ReactNode }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const {
+    data: profile,
+    isLoading: profileLoading,
+    error: profileError,
+  } = useProfile();
 
-  return <>{children}</>;
+  useEffect(() => {
+    if (
+      profile &&
+      !profile.profile_completed &&
+      !location.pathname.startsWith("/profile")
+    ) {
+      navigate(
+        {
+          pathname: "/profile",
+          search: "?setup=1",
+        },
+        {
+          replace: true,
+          state: { from: `${location.pathname}${location.search}` },
+        }
+      );
+    }
+  }, [navigate, profile, location.pathname, location.search]);
+
+  return (
+    <>
+      {children}
+      {profileLoading && (
+        <div className="fixed bottom-4 right-4 rounded-full bg-background/90 px-3 py-1 text-xs text-muted-foreground shadow-lg backdrop-blur">
+          Memuat profil...
+        </div>
+      )}
+      {profileError && (
+        <div className="fixed bottom-4 right-4 rounded-full border border-destructive/40 bg-destructive/10 px-3 py-1 text-xs text-destructive shadow-lg backdrop-blur">
+          Gagal memuat profil
+        </div>
+      )}
+    </>
+  );
 };

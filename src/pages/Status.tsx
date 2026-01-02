@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/app/AppShell";
 import { Section } from "@/components/ui/Section";
@@ -27,6 +27,7 @@ const Status = () => {
       if (!user) return;
 
       const currentYear = new Date().getFullYear();
+      const supabase = await getSupabaseClient();
       const { data: transactions } = await supabase
         .from("transactions")
         .select("type, amount, date")

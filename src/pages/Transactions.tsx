@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Plus, Info, Settings, PlusCircle, X, NotebookPen } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { AppShell } from '@/app/AppShell';
 import { Section } from '@/components/ui/Section';
@@ -60,6 +60,7 @@ const Transactions = () => {
     setLoading(true);
     setError(null);
 
+    const supabase = await getSupabaseClient();
     const { data, error: queryError } = await supabase
       .from('transactions')
       .select('*')
@@ -102,6 +103,7 @@ const Transactions = () => {
       return;
     }
 
+    const supabase = await getSupabaseClient();
     if (editingId) {
       const { error: updateError } = await supabase
         .from('transactions')
@@ -149,6 +151,7 @@ const Transactions = () => {
   const handleDelete = async (id: string) => {
     if (!confirm('Yakin ingin menghapus transaksi ini?')) return;
 
+    const supabase = await getSupabaseClient();
     const { error: deleteError } = await supabase
       .from('transactions')
       .delete()

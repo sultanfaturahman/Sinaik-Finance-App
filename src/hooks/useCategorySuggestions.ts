@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import {
   CATEGORY_SUGGESTIONS_KEY,
@@ -198,6 +198,7 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
 
     const fetchPreferences = async () => {
       try {
+        const supabase = await getSupabaseClient();
         const { data, error } = await supabase
           .from('profiles')
           .select('onboarding_completed, selected_sector, category_suggestions, profile_completed')
@@ -279,10 +280,13 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
       writeStorage(getStorageKey(CATEGORY_SUGGESTIONS_KEY), unique);
 
       if (userId) {
-        void supabase
-          .from('profiles')
-          .update({ category_suggestions: unique })
-          .eq('id', userId);
+        void (async () => {
+          const supabase = await getSupabaseClient();
+          await supabase
+            .from('profiles')
+            .update({ category_suggestions: unique })
+            .eq('id', userId);
+        })();
       }
     },
     [getStorageKey, userId]
@@ -294,10 +298,13 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
       writeStorage(getStorageKey(SELECTED_SECTOR_KEY), id);
 
       if (userId) {
-        void supabase
-          .from('profiles')
-          .update({ selected_sector: id })
-          .eq('id', userId);
+        void (async () => {
+          const supabase = await getSupabaseClient();
+          await supabase
+            .from('profiles')
+            .update({ selected_sector: id })
+            .eq('id', userId);
+        })();
       }
 
       const preset = SECTOR_PRESETS.find((item) => item.id === id);
@@ -329,7 +336,10 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
           payload.selected_sector = sectorId;
         }
 
-        void supabase.from('profiles').update(payload).eq('id', userId);
+        void (async () => {
+          const supabase = await getSupabaseClient();
+          await supabase.from('profiles').update(payload).eq('id', userId);
+        })();
       }
     },
     [getStorageKey, persistSuggestions, sectorId, userId]
@@ -372,14 +382,17 @@ export const useCategorySuggestions = (): CategorySuggestionState => {
     removeStorage(getStorageKey(CATEGORY_SUGGESTIONS_KEY));
 
     if (userId) {
-      void supabase
-        .from('profiles')
-        .update({
-          onboarding_completed: false,
-          selected_sector: null,
-          category_suggestions: [],
-        })
-        .eq('id', userId);
+      void (async () => {
+        const supabase = await getSupabaseClient();
+        await supabase
+          .from('profiles')
+          .update({
+            onboarding_completed: false,
+            selected_sector: null,
+            category_suggestions: [],
+          })
+          .eq('id', userId);
+      })();
     }
   }, [getStorageKey, userId]);
 

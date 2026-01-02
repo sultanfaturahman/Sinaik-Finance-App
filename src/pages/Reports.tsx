@@ -8,7 +8,7 @@ import {
   Target,
   FileText,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/app/AppShell";
 import { Section } from "@/components/ui/Section";
@@ -43,6 +43,7 @@ const Reports = () => {
       setLoading(true);
       setError(null);
 
+      const supabase = await getSupabaseClient();
       const { data: transactions, error: queryError } = await supabase
         .from("transactions")
         .select("type, amount, date")

@@ -1,8 +1,8 @@
 import { ReactNode, useEffect, useState } from "react";
-import { Session, User } from "@supabase/supabase-js";
+import type { Session, User } from "@supabase/supabase-js";
 import { useNavigate } from "react-router-dom";
 
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { AuthContext } from "@/hooks/useAuth";
 
 interface AuthProviderProps {
@@ -16,24 +16,41 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, sessionData) => {
-      setSession(sessionData);
-      setUser(sessionData?.user ?? null);
-      setLoading(false);
-    });
+    let unsubscribed = false;
+    let subscription: { unsubscribe: () => void } | null = null;
 
-    supabase.auth.getSession().then(({ data: { session: sessionData } }) => {
-      setSession(sessionData);
-      setUser(sessionData?.user ?? null);
-      setLoading(false);
-    });
+    const initializeSession = async () => {
+      const supabase = await getSupabaseClient();
 
-    return () => subscription.unsubscribe();
+      const { data } = supabase.auth.onAuthStateChange((_event, sessionData) => {
+        setSession(sessionData);
+        setUser(sessionData?.user ?? null);
+        setLoading(false);
+      });
+
+      subscription = data.subscription;
+
+      const {
+        data: { session: sessionData },
+      } = await supabase.auth.getSession();
+
+      if (!unsubscribed) {
+        setSession(sessionData);
+        setUser(sessionData?.user ?? null);
+        setLoading(false);
+      }
+    };
+
+    void initializeSession();
+
+    return () => {
+      unsubscribed = true;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
+    const supabase = await getSupabaseClient();
     await supabase.auth.signOut();
     navigate("/auth");
   };
@@ -44,4 +61,3 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     </AuthContext.Provider>
   );
 };
-

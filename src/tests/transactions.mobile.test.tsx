@@ -22,16 +22,20 @@ const sampleTransactions = [
 const orderMock = vi.fn().mockResolvedValue({ data: sampleTransactions, error: null });
 const eqMock = vi.fn().mockReturnValue({ order: orderMock });
 const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+const insertMock = vi.fn().mockResolvedValue({ error: null });
+const updateMock = vi.fn().mockResolvedValue({ error: null });
+const deleteEqMock = vi.fn().mockResolvedValue({ error: null });
+const deleteMock = vi.fn(() => ({ eq: deleteEqMock }));
+const fromMock = vi.fn(() => ({
+  select: selectMock,
+  insert: insertMock,
+  update: updateMock,
+  delete: deleteMock,
+}));
+const getSupabaseClientMock = vi.fn().mockResolvedValue({ from: fromMock });
 
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: selectMock,
-      insert: vi.fn().mockResolvedValue({ error: null }),
-      update: vi.fn().mockResolvedValue({ error: null }),
-      delete: vi.fn(() => ({ eq: vi.fn().mockResolvedValue({ error: null }) })),
-    })),
-  },
+  getSupabaseClient: getSupabaseClientMock,
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
@@ -66,6 +70,20 @@ describe('Transactions responsive layout', () => {
       defaultOptions: { queries: { retry: false } },
     });
     vi.clearAllMocks();
+    orderMock.mockResolvedValue({ data: sampleTransactions, error: null });
+    eqMock.mockReturnValue({ order: orderMock });
+    selectMock.mockReturnValue({ eq: eqMock });
+    insertMock.mockResolvedValue({ error: null });
+    updateMock.mockResolvedValue({ error: null });
+    deleteEqMock.mockResolvedValue({ error: null });
+    deleteMock.mockReturnValue({ eq: deleteEqMock });
+    fromMock.mockReturnValue({
+      select: selectMock,
+      insert: insertMock,
+      update: updateMock,
+      delete: deleteMock,
+    });
+    getSupabaseClientMock.mockResolvedValue({ from: fromMock });
     localStorage.clear();
   });
 

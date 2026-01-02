@@ -3,7 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { ExcelExport } from "@/components/ExcelExport";
 import { useToast } from "@/components/ui/use-toast";
 import { ImportWizard, ImportRow } from "@/components/import/ImportWizard";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 const ImportExport = () => {
@@ -26,6 +26,7 @@ const ImportExport = () => {
       source: "excel" as const,
     }));
 
+    const supabase = await getSupabaseClient();
     const { error } = await supabase.from("transactions").insert(payload);
     if (error) {
       toast({

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -105,6 +105,7 @@ export const TemplateDialog = ({ open, onOpenChange, template }: TemplateDialogP
 
   const saveTemplate = useMutation({
     mutationFn: async (values: TemplateFormData) => {
+      const supabase = await getSupabaseClient();
       const { data: session } = await supabase.auth.getSession();
       const userId = session.session?.user?.id;
 

@@ -11,17 +11,19 @@ const fromMock = vi.hoisted(() => vi.fn());
 const selectMock = vi.hoisted(() => vi.fn());
 const eqMock = vi.hoisted(() => vi.fn());
 const maybeSingleMock = vi.hoisted(() => vi.fn());
+const getSupabaseClientMock = vi.hoisted(() => vi.fn());
+const supabaseClient = {
+  functions: {
+    invoke: invokeMock,
+  },
+  auth: {
+    getSession: getSessionMock,
+  },
+  from: fromMock,
+};
 
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    functions: {
-      invoke: invokeMock,
-    },
-    auth: {
-      getSession: getSessionMock,
-    },
-    from: fromMock,
-  },
+  getSupabaseClient: getSupabaseClientMock,
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
@@ -80,6 +82,8 @@ describe('AI Strategy page', () => {
     selectMock.mockReset();
     eqMock.mockReset();
     maybeSingleMock.mockReset();
+    getSupabaseClientMock.mockReset();
+    getSupabaseClientMock.mockResolvedValue(supabaseClient);
 
     getSessionMock.mockResolvedValue({ data: { session: { access_token: 'token-123' } } });
 

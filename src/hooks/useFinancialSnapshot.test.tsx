@@ -28,18 +28,22 @@ const mockStatusChain = () => {
 let transactionsChain = mockTransactionsChain();
 let statusChain = mockStatusChain();
 
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn((table: string) => {
-      if (table === 'transactions') {
-        return { select: transactionsChain.select };
-      }
-      if (table === 'umkm_status') {
-        return { select: statusChain.select };
-      }
-      throw new Error(`Unexpected table ${table}`);
-    }),
+const getSupabaseClient = vi.fn();
+const mockSupabaseClient = {
+  from: (table: string) => {
+    if (table === 'transactions') {
+      return { select: transactionsChain.select };
+    }
+    if (table === 'umkm_status') {
+      return { select: statusChain.select };
+    }
+    throw new Error(`Unexpected table ${table}`);
   },
+};
+getSupabaseClient.mockResolvedValue(mockSupabaseClient);
+
+vi.mock('@/integrations/supabase/client', () => ({
+  getSupabaseClient,
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
@@ -51,6 +55,7 @@ describe('useFinancialSnapshot', () => {
     vi.clearAllMocks();
     transactionsChain = mockTransactionsChain();
     statusChain = mockStatusChain();
+    getSupabaseClient.mockResolvedValue(mockSupabaseClient);
   });
 
   it('returns aggregated snapshot data', async () => {

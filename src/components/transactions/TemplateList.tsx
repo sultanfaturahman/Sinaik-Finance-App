@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +37,7 @@ export const TemplateList = ({ onTransactionCreated }: TemplateListProps) => {
     queryFn: async () => {
       if (!user) return [];
 
+      const supabase = await getSupabaseClient();
       const { data, error: fetchError } = await supabase
         .from("transaction_templates")
         .select("*")
@@ -53,6 +54,7 @@ export const TemplateList = ({ onTransactionCreated }: TemplateListProps) => {
 
   const deleteTemplate = useMutation({
     mutationFn: async (id: string) => {
+      const supabase = await getSupabaseClient();
       const { error: deleteError } = await supabase
         .from("transaction_templates")
         .delete()
@@ -81,6 +83,7 @@ export const TemplateList = ({ onTransactionCreated }: TemplateListProps) => {
         throw new Error("Pengguna belum masuk");
       }
 
+      const supabase = await getSupabaseClient();
       const { error: insertError } = await supabase.from("transactions").insert([
         {
           user_id: user.id,

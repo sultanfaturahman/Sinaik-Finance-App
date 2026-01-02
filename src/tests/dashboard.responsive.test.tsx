@@ -11,13 +11,15 @@ const orderMock = vi.fn().mockResolvedValue({
   ],
   error: null,
 });
+const eqMock = vi.fn(() => ({ order: orderMock }));
+const selectMock = vi.fn(() => ({ eq: eqMock }));
+const fromMock = vi.fn(() => ({ select: selectMock }));
+const getSupabaseClientMock = vi.fn().mockResolvedValue({
+  from: fromMock,
+});
 
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({ eq: vi.fn(() => ({ select: vi.fn(), order: orderMock })) })),
-    })),
-  },
+  getSupabaseClient: getSupabaseClientMock,
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
@@ -46,6 +48,17 @@ describe('Dashboard responsive grid', () => {
       defaultOptions: { queries: { retry: false } },
     });
     vi.clearAllMocks();
+    orderMock.mockResolvedValue({
+      data: [
+        { type: 'income', amount: 200000 },
+        { type: 'expense', amount: 50000 },
+      ],
+      error: null,
+    });
+    eqMock.mockReturnValue({ order: orderMock });
+    selectMock.mockReturnValue({ eq: eqMock });
+    fromMock.mockReturnValue({ select: selectMock });
+    getSupabaseClientMock.mockResolvedValue({ from: fromMock });
   });
 
   it('renders stat cards grid with responsive classes', async () => {

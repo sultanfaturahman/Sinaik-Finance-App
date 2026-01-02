@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { StrategyFinancialSnapshot } from "@/types/strategy";
 import { useCallback, useEffect, useState } from "react";
 
@@ -26,6 +26,7 @@ export const useFinancialSnapshot = (): UseFinancialSnapshotState => {
     setError(null);
 
     try {
+      const supabase = await getSupabaseClient();
       const { data: transactions, error: txError } = await supabase
         .from("transactions")
         .select("type, amount, category, date")

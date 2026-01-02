@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { TrendingUp, TrendingDown, Wallet, Receipt } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell } from "@/app/AppShell";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -35,6 +35,7 @@ const Dashboard = () => {
     const fetchStats = async () => {
       if (!user) return;
 
+      const supabase = await getSupabaseClient();
       const { data: transactions } = await supabase
         .from("transactions")
         .select("type, amount")

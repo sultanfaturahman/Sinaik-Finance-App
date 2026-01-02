@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -42,6 +42,7 @@ export const ExcelImport = ({
   const checkDuplicate = async (transaction: Omit<ParsedTransaction, 'isDuplicate' | 'error'>) => {
     if (!user) return false;
 
+    const supabase = await getSupabaseClient();
     const { data, error } = await supabase
       .from('transactions')
       .select('id')
@@ -202,6 +203,7 @@ export const ExcelImport = ({
         source: 'excel' as const,
       }));
 
+      const supabase = await getSupabaseClient();
       const { error } = await supabase
         .from('transactions')
         .insert(transactionsToInsert);
@@ -225,7 +227,8 @@ export const ExcelImport = ({
     }
   };
 
-  const downloadTemplate = () => {
+  const downloadTemplate = async () => {
+    const XLSX = await loadXlsx();
     const template = [
       {
         tanggal: '2025-01-15',

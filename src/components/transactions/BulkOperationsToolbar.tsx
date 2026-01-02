@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -53,6 +53,7 @@ export const BulkOperationsToolbar = ({
   const handleBulkDelete = async () => {
     try {
       setIsProcessing(true);
+      const supabase = await getSupabaseClient();
       const { error } = await supabase.from("transactions").delete().in("id", idList);
       if (error) {
         throw error;
@@ -74,6 +75,7 @@ export const BulkOperationsToolbar = ({
 
   const handleBulkExport = async () => {
     try {
+      const supabase = await getSupabaseClient();
       const { data, error } = await supabase
         .from("transactions")
         .select("*")
@@ -106,6 +108,7 @@ export const BulkOperationsToolbar = ({
 
     try {
       setIsProcessing(true);
+      const supabase = await getSupabaseClient();
       const { error } = await supabase
         .from("transactions")
         .update({ category: trimmed })

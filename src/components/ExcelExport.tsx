@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { getSupabaseClient } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import { Download } from 'lucide-react';
@@ -13,6 +13,7 @@ export const ExcelExport = ({ className, ...buttonProps }: ButtonProps) => {
 
     try {
       const XLSX = await loadXlsx();
+      const supabase = await getSupabaseClient();
       const { data: transactions, error } = await supabase
         .from('transactions')
         .select('date, type, category, amount, note, source')

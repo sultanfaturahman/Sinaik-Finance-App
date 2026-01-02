@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Loader2, NotebookPen } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/app/AppShell";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCategorySuggestions } from "@/hooks/useCategorySuggestions";
 import { Section } from "@/components/ui/Section";
@@ -61,6 +61,7 @@ const Notes = () => {
     }
 
     setLoading((prev) => ({ ...prev, [frequency]: true }));
+    const supabase = await getSupabaseClient();
     const { data, error } = await supabase
       .from("financial_reports")
       .select("*")
@@ -128,6 +129,7 @@ const Notes = () => {
     setSubmitting((prev) => ({ ...prev, [frequency]: true }));
 
     try {
+      const supabase = await getSupabaseClient();
       const { error } = await supabase
         .from("financial_reports")
         .upsert(

@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { ONBOARDING_COMPLETED_KEY } from "@/constants/categoryPresets";
@@ -103,6 +103,7 @@ const ProfilePage = () => {
 
       const timestamp = new Date().toISOString();
 
+      const supabase = await getSupabaseClient();
       const { data, error } = await supabase
         .from("profiles")
         .update({

@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseClient } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import type { Database } from "@/integrations/supabase/types";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 const selectProfile = async (userId: string, email: string | undefined, name?: string | null) => {
+  const supabase = await getSupabaseClient();
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
