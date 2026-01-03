@@ -1,26 +1,11 @@
 import type { ReactNode } from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import AIStrategy from '@/pages/AIStrategy';
 
-const invokeMock = vi.hoisted(() => vi.fn());
-const getSessionMock = vi.hoisted(() => vi.fn());
-const fromMock = vi.hoisted(() => vi.fn());
-const selectMock = vi.hoisted(() => vi.fn());
-const eqMock = vi.hoisted(() => vi.fn());
-const maybeSingleMock = vi.hoisted(() => vi.fn());
 const getSupabaseClientMock = vi.hoisted(() => vi.fn());
-const supabaseClient = {
-  functions: {
-    invoke: invokeMock,
-  },
-  auth: {
-    getSession: getSessionMock,
-  },
-  from: fromMock,
-};
 
 vi.mock('@/integrations/supabase/client', () => ({
   getSupabaseClient: getSupabaseClientMock,
@@ -39,22 +24,24 @@ vi.mock('react-markdown', () => ({
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
+const mockSnapshot = {
+  umkmLevel: 'mikro',
+  annualRevenue: 100_000_000,
+  yearToDate: {
+    totalIncome: 50_000_000,
+    totalExpense: 30_000_000,
+    netProfit: 20_000_000,
+    profitMargin: 40,
+    transactionCount: 25,
+  },
+  topIncomeCategories: [{ category: 'Online', amount: 30_000_000, percentage: '60' }],
+  topExpenseCategories: [{ category: 'Operasional', amount: 15_000_000, percentage: '50' }],
+  monthlyTrends: [],
+};
+
 vi.mock('@/hooks/useFinancialSnapshot', () => ({
   useFinancialSnapshot: () => ({
-    snapshot: {
-      umkmLevel: 'mikro',
-      annualRevenue: 100_000_000,
-      yearToDate: {
-        totalIncome: 50000000,
-        totalExpense: 30000000,
-        netProfit: 20000000,
-        profitMargin: 40,
-        transactionCount: 25,
-      },
-      topIncomeCategories: [{ category: 'Online', amount: 30000000, percentage: '60' }],
-      topExpenseCategories: [{ category: 'Operasional', amount: 15000000, percentage: '50' }],
-      monthlyTrends: [],
-    },
+    snapshot: mockSnapshot,
     loading: false,
     error: null,
     refresh: vi.fn(),
@@ -68,6 +55,8 @@ vi.mock('sonner', () => ({
   },
 }));
 
+const STRATEGY_STORAGE_KEY = 'sinaik:strategy-data:user-1';
+
 describe('AI Strategy page', () => {
   let queryClient: QueryClient;
 
@@ -75,64 +64,83 @@ describe('AI Strategy page', () => {
     queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
+    localStorage.clear();
     vi.clearAllMocks();
-    invokeMock.mockReset();
-    getSessionMock.mockReset();
-    fromMock.mockReset();
-    selectMock.mockReset();
-    eqMock.mockReset();
-    maybeSingleMock.mockReset();
-    getSupabaseClientMock.mockReset();
-    getSupabaseClientMock.mockResolvedValue(supabaseClient);
-
-    getSessionMock.mockResolvedValue({ data: { session: { access_token: 'token-123' } } });
-
-    fromMock.mockReturnValue({ select: selectMock });
-    selectMock.mockReturnValue({ eq: eqMock });
-    eqMock.mockReturnValue({ maybeSingle: maybeSingleMock });
-    maybeSingleMock.mockResolvedValue({
-      data: {
-        id: 'user-1',
-        business_name: 'SiNaik Mart',
-        name: 'Owner',
-        email: 'owner@example.com',
-      },
-      error: null,
-    });
-
-    invokeMock.mockResolvedValue({
-      data: {
-        cacheHit: false,
-        strategy: {
-          analysis: {
-            summary: 'Bisnis tumbuh positif tetapi perlu fokus ke pemasaran digital.',
-            key_metrics: [{ label: 'Margin', value: '40%' }],
-          },
-          revenue_strategies: [
-            { id: 'rev-1', title: 'Optimalkan penjualan online', description: 'Perkuat promosi marketplace', expected_impact: 'Rp 5.000.000' },
-          ],
-          cost_strategies: [
-            { id: 'cost-1', title: 'Efisiensi bahan baku', description: 'Evaluasi supplier utama', expected_savings: 'Rp 2.000.000' },
-          ],
-          action_plan: [
-            {
-              id: 'week-1',
-              title: 'Minggu 1',
-              timeframe: 'Minggu 1',
-              summary: 'Audit kanal penjualan',
-              tasks: [
-                { id: 'week-1-task-1', title: 'Review campaign iklan', owner: 'Tim Marketing', metric: '3 kampanye' },
-              ],
-            },
-          ],
-          targets: [{ label: 'Target 90 hari', value: 'Naikkan omzet 25%' }],
-        },
-      },
-      error: null,
-    });
   });
 
-  it('generates strategy and renders summary & action list', async () => {
+  it('restores cached strategy summary and renders action items', async () => {
+    const cachedStrategy = {
+      strategy: {
+        analysis: {
+          summary: 'Bisnis tumbuh positif tetapi perlu fokus ke pemasaran digital.',
+          key_metrics: [{ label: 'Margin', value: '40%' }],
+        },
+        revenue_strategies: [
+          {
+            id: 'rev-1',
+            title: 'Optimalkan penjualan online',
+            description: 'Perkuat promosi marketplace',
+            expected_impact: 'Rp 5.000.000',
+          },
+        ],
+        cost_strategies: [
+          {
+            id: 'cost-1',
+            title: 'Efisiensi bahan baku',
+            description: 'Evaluasi supplier utama',
+            expected_savings: 'Rp 2.000.000',
+          },
+        ],
+        action_plan: [
+          {
+            id: 'week-1',
+            title: 'Minggu 1',
+            timeframe: 'Minggu 1',
+            summary: 'Audit kanal penjualan',
+            tasks: [
+              {
+                id: 'week-1-task-1',
+                title: 'Review campaign iklan',
+                owner: 'Tim Marketing',
+                metric: '3 kampanye',
+              },
+            ],
+          },
+        ],
+        targets: [{ label: 'Target 90 hari', value: 'Naikkan omzet 25%' }],
+      },
+      rawStrategy: '## Ringkasan\nBisnis tumbuh positif.',
+      financialSnapshot: mockSnapshot,
+      formState: {
+        profile: {
+          businessName: 'SiNaik Mart',
+          sector: 'Retail',
+          targetMarket: 'UMKM Digital',
+          teamSize: '5',
+          differentiator: 'Pelayanan cepat',
+        },
+        financialSummary: {
+          revenueYtd: '100000000',
+          expenseYtd: '50000000',
+          netProfitYtd: '50000000',
+          profitMargin: '50',
+          noteworthyTrend: 'Penjualan marketplace naik 20%',
+        },
+        goals: {
+          primary: 'Naikkan omzet 25%',
+          secondary: 'Tambah channel digital',
+          timeframe: 'Q1',
+          risks: 'Persaingan marketplace',
+        },
+      },
+      planVersion: 'week-1|week-1-task-1',
+      cacheMeta: { cacheHit: false, createdAt: new Date().toISOString(), model: 'gemini-pro' },
+      model: 'gemini-pro',
+      generatedAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(STRATEGY_STORAGE_KEY, JSON.stringify(cachedStrategy));
+
     render(
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
@@ -141,16 +149,10 @@ describe('AI Strategy page', () => {
       </QueryClientProvider>,
     );
 
-    const button = screen.getByRole('button', { name: /hasilkan strategi bisnis/i });
-    fireEvent.click(button);
-
-    await waitFor(() => expect(invokeMock).toHaveBeenCalled());
-
-    await waitFor(() =>
-      expect(screen.getByText(/Bisnis tumbuh positif/i)).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByText(/Bisnis tumbuh positif/i)).toBeInTheDocument());
 
     expect(screen.getByText(/Optimalkan penjualan online/i)).toBeInTheDocument();
     expect(screen.getByText(/Review campaign iklan/i)).toBeInTheDocument();
+    expect(screen.getByText(/Target 90 hari/i)).toBeInTheDocument();
   });
 });

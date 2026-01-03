@@ -32,7 +32,7 @@ const fromMock = vi.fn(() => ({
   update: updateMock,
   delete: deleteMock,
 }));
-const getSupabaseClientMock = vi.fn().mockResolvedValue({ from: fromMock });
+const getSupabaseClientMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/integrations/supabase/client', () => ({
   getSupabaseClient: getSupabaseClientMock,
@@ -106,4 +106,3 @@ describe('Transactions responsive layout', () => {
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
   });
 });
-

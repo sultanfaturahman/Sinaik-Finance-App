@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Plus, Info, Settings, PlusCircle, X, NotebookPen } from 'lucide-react';
@@ -22,16 +22,49 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { ListSkeleton } from '@/components/ui/ListSkeleton';
-import { ExcelImport } from '@/components/ExcelImport';
-import { ExcelExport } from '@/components/ExcelExport';
 import { useCategorySuggestions } from '@/hooks/useCategorySuggestions';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { TransactionTable } from '@/components/transactions/TransactionTable';
-import { TransactionItemCard } from '@/components/transactions/TransactionItemCard';
-import { TemplateList } from '@/components/transactions/TemplateList';
-import { BulkOperationsToolbar } from '@/components/transactions/BulkOperationsToolbar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Transaction } from '@/types/transaction';
+
+const ExcelImport = lazy(async () => ({
+  default: (await import('@/components/ExcelImport')).ExcelImport,
+}));
+const ExcelExport = lazy(async () => ({
+  default: (await import('@/components/ExcelExport')).ExcelExport,
+}));
+const TransactionTable = lazy(async () => ({
+  default: (await import('@/components/transactions/TransactionTable')).TransactionTable,
+}));
+const TransactionItemCard = lazy(async () => ({
+  default: (await import('@/components/transactions/TransactionItemCard')).TransactionItemCard,
+}));
+const TemplateList = lazy(async () => ({
+  default: (await import('@/components/transactions/TemplateList')).TemplateList,
+}));
+const BulkOperationsToolbar = lazy(async () => ({
+  default: (await import('@/components/transactions/BulkOperationsToolbar')).BulkOperationsToolbar,
+}));
+
+const ButtonSkeleton = ({ label, className }: { label: string; className?: string }) => (
+  <Button disabled className={`animate-pulse ${className ?? ''}`}>
+    {label}
+  </Button>
+);
+
+const BulkToolbarFallback = () => (
+  <div className="h-20 rounded-xl border bg-muted/30 animate-pulse" />
+);
+
+const MobileTransactionsFallback = ({ count = 3 }: { count?: number }) => (
+  <div className="space-y-3">
+    {Array.from({ length: count }).map((_, index) => (
+      <div key={index} className="h-28 rounded-2xl border bg-muted/40 animate-pulse" />
+    ))}
+  </div>
+);
+
+const TemplateListFallback = () => <ListSkeleton rows={3} columns={3} />;
 
 const Transactions = () => {
   const { user } = useAuth();
@@ -250,11 +283,23 @@ const Transactions = () => {
               description="Gunakan import untuk upload massal atau export untuk backup laporan."
               actions={
                 <div className="grid grid-cols-1 gap-2 md:flex md:items-center">
-                  <ExcelExport className="w-full md:w-auto" />
-                  <ExcelImport
-                    onImportComplete={fetchTransactions}
-                    onCategoriesImported={bulkAddSuggestions}
-                  />
+                  <Suspense
+                    fallback={
+                      <ButtonSkeleton label="Memuat Export..." className="w-full md:w-auto" />
+                    }
+                  >
+                    <ExcelExport className="w-full md:w-auto" />
+                  </Suspense>
+                  <Suspense
+                    fallback={
+                      <ButtonSkeleton label="Memuat Import..." className="w-full md:w-auto" />
+                    }
+                  >
+                    <ExcelImport
+                      onImportComplete={fetchTransactions}
+                      onCategoriesImported={bulkAddSuggestions}
+                    />
+                  </Suspense>
                 </div>
               }
             >
@@ -299,43 +344,61 @@ const Transactions = () => {
                       <Button onClick={() => setDialogOpen(true)} className="w-full">
                         Tambah Manual
                       </Button>
-                      <ExcelImport
-                        onImportComplete={fetchTransactions}
-                        onCategoriesImported={bulkAddSuggestions}
-                      />
+                      <Suspense
+                        fallback={
+                          <ButtonSkeleton label="Memuat Import..." className="w-full" />
+                        }
+                      >
+                        <ExcelImport
+                          onImportComplete={fetchTransactions}
+                          onCategoriesImported={bulkAddSuggestions}
+                        />
+                      </Suspense>
                     </>
                   }
                 />
               ) : (
                 <>
-                  <BulkOperationsToolbar
-                    selectedIds={selectedIds}
-                    availableCategories={suggestions}
-                    onClearSelection={clearSelection}
-                    onActionComplete={fetchTransactions}
-                  />
-                  {isMobile ? (
-                    <div className="space-y-3">
-                      {transactions.map((transaction) => (
-                        <TransactionItemCard
-                          key={transaction.id}
-                          transaction={transaction}
-                          selected={selectedIds.has(transaction.id)}
-                          onToggleSelect={toggleSelect}
-                          onEdit={handleEdit}
-                          onDelete={handleDelete}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <TransactionTable
-                      data={transactions}
+                  <Suspense fallback={<BulkToolbarFallback />}>
+                    <BulkOperationsToolbar
                       selectedIds={selectedIds}
-                      onToggleSelect={toggleSelect}
-                      onToggleSelectAll={toggleSelectAll}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
+                      availableCategories={suggestions}
+                      onClearSelection={clearSelection}
+                      onActionComplete={fetchTransactions}
                     />
+                  </Suspense>
+                  {isMobile ? (
+                    <Suspense
+                      fallback={
+                        <MobileTransactionsFallback
+                          count={Math.max(1, Math.min(transactions.length || 3, 5))}
+                        />
+                      }
+                    >
+                      <div className="space-y-3">
+                        {transactions.map((transaction) => (
+                          <TransactionItemCard
+                            key={transaction.id}
+                            transaction={transaction}
+                            selected={selectedIds.has(transaction.id)}
+                            onToggleSelect={toggleSelect}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                          />
+                        ))}
+                      </div>
+                    </Suspense>
+                  ) : (
+                    <Suspense fallback={<ListSkeleton rows={5} columns={7} />}>
+                      <TransactionTable
+                        data={transactions}
+                        selectedIds={selectedIds}
+                        onToggleSelect={toggleSelect}
+                        onToggleSelectAll={toggleSelectAll}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                      />
+                    </Suspense>
                   )}
                 </>
               )}
@@ -344,7 +407,9 @@ const Transactions = () => {
         </TabsContent>
 
         <TabsContent value="templates">
-          <TemplateList onTransactionCreated={fetchTransactions} />
+          <Suspense fallback={<TemplateListFallback />}>
+            <TemplateList onTransactionCreated={fetchTransactions} />
+          </Suspense>
         </TabsContent>
       </Tabs>
 

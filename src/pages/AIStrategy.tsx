@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Sparkles, Loader2, AlertCircle, Trash2 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
 import { AppShell } from '@/app/AppShell';
 import { getSupabaseClient } from '@/integrations/supabase/client';
@@ -26,6 +25,10 @@ import type {
   StrategyFinancialSnapshot,
   StrategyFormState,
 } from '@/types/strategy';
+
+const MarkdownRenderer = lazy(async () => ({
+  default: (await import('react-markdown')).default,
+}));
 
 const STORAGE_PREFIX = 'sinaik:strategy-tracker';
 const STRATEGY_DATA_PREFIX = 'sinaik:strategy-data';
@@ -92,6 +95,10 @@ const parseMarkdownSections = (markdown: string): MarkdownSection[] => {
 const makePlanVersion = (steps: StrategyStep[]) =>
   steps.map((step) => step.id).join('|');
 
+const MarkdownSectionFallback = () => (
+  <div className="h-24 rounded-2xl border border-muted/50 bg-muted/30 animate-pulse" />
+);
+
 const AIStrategy = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -107,13 +114,16 @@ const AIStrategy = () => {
   const [cacheMeta, setCacheMeta] = useState<{ cacheHit: boolean; createdAt?: string; model?: string | null } | null>(null);
   const [storedSnapshot, setStoredSnapshot] = useState<StrategyFinancialSnapshot | null>(null);
   const [modelName, setModelName] = useState<string | null>(null);
+  const shouldParseMarkdown = showRawStrategy && detailView === 'sections';
 
   const { snapshot, loading: _snapshotLoading, error: snapshotError } = useFinancialSnapshot();
 
-  const markdownSections = useMemo(
-    () => (rawStrategy ? parseMarkdownSections(rawStrategy) : []),
-    [rawStrategy]
-  );
+  const markdownSections = useMemo(() => {
+    if (!rawStrategy || !shouldParseMarkdown) {
+      return [];
+    }
+    return parseMarkdownSections(rawStrategy);
+  }, [rawStrategy, shouldParseMarkdown]);
 
   const persistStrategyData = (
     data: {
@@ -797,7 +807,9 @@ const AIStrategy = () => {
                         </AccordionTrigger>
                         <AccordionContent className="px-4 pb-4">
                           <div className="prose prose-sm max-w-none text-muted-foreground [&_strong]:text-foreground">
-                            <ReactMarkdown>{section.content}</ReactMarkdown>
+                            <Suspense fallback={<MarkdownSectionFallback />}>
+                              <MarkdownRenderer>{section.content}</MarkdownRenderer>
+                            </Suspense>
                           </div>
                         </AccordionContent>
                       </AccordionItem>

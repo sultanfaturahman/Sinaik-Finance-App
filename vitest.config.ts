@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      'react-markdown': path.resolve(__dirname, './src/tests/mocks/react-markdown.tsx'),
     },
   },
   test: {

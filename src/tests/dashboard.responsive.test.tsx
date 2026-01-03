@@ -14,9 +14,7 @@ const orderMock = vi.fn().mockResolvedValue({
 const eqMock = vi.fn(() => ({ order: orderMock }));
 const selectMock = vi.fn(() => ({ eq: eqMock }));
 const fromMock = vi.fn(() => ({ select: selectMock }));
-const getSupabaseClientMock = vi.fn().mockResolvedValue({
-  from: fromMock,
-});
+const getSupabaseClientMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/integrations/supabase/client', () => ({
   getSupabaseClient: getSupabaseClientMock,

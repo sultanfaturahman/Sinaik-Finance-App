@@ -28,7 +28,7 @@ const mockStatusChain = () => {
 let transactionsChain = mockTransactionsChain();
 let statusChain = mockStatusChain();
 
-const getSupabaseClient = vi.fn();
+const getSupabaseClient = vi.hoisted(() => vi.fn());
 const mockSupabaseClient = {
   from: (table: string) => {
     if (table === 'transactions') {
