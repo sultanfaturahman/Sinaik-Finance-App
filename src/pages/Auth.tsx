@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getSupabaseClient } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const emailSchema = z.string().email('Email tidak valid');
 const passwordSchema = z.string().min(6, 'Password minimal 6 karakter');
@@ -15,8 +16,10 @@ const nameSchema = z.string().min(2, 'Nama minimal 2 karakter');
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [loginNotice, setLoginNotice] = useState<string | null>(null);
 
   // Login state
   const [loginEmail, setLoginEmail] = useState('');
@@ -82,7 +85,7 @@ const Auth = () => {
         data: {
           name: registerName,
         },
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/auth?verified=1`,
       },
     });
 
@@ -92,10 +95,28 @@ const Auth = () => {
       return;
     }
 
-    toast.success('Akun berhasil dibuat! Silakan login.');
+    setLoginNotice(`Kami telah mengirim tautan konfirmasi ke ${registerEmail}. Silakan buka email tersebut lalu verifikasi untuk melanjutkan.`);
     setActiveTab('login');
     setLoading(false);
   };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('verified') === '1') {
+      setLoginNotice('Email Anda berhasil dikonfirmasi. Silakan masuk dengan kredensial yang telah dibuat.');
+      setActiveTab('login');
+    }
+
+    if (location.hash) {
+      const hashParams = new URLSearchParams(location.hash.replace('#', ''));
+      const type = hashParams.get('type');
+      if (type === 'signup') {
+        setLoginNotice('Email Anda berhasil dikonfirmasi. Silakan masuk dengan kredensial yang telah dibuat.');
+        setActiveTab('login');
+        window.history.replaceState({}, '', location.pathname + location.search);
+      }
+    }
+  }, [location]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
@@ -115,6 +136,11 @@ const Auth = () => {
 
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
+                {loginNotice && (
+                  <Alert className="border-primary/30 bg-primary/5 text-sm">
+                    <AlertDescription>{loginNotice}</AlertDescription>
+                  </Alert>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="login-email">Email</Label>
                   <Input

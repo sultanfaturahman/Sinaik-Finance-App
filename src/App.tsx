@@ -15,7 +15,6 @@ const Status = lazy(() => import("@/pages/Status"));
 const AIStrategy = lazy(() => import("@/pages/AIStrategy"));
 const ImportExport = lazy(() => import("@/pages/ImportExport"));
 const Settings = lazy(() => import("@/pages/Settings"));
-const Notes = lazy(() => import("@/pages/Notes"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
@@ -51,14 +50,6 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Transactions />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/notes"
-                element={
-                  <ProtectedRoute>
-                    <Notes />
                   </ProtectedRoute>
                 }
               />

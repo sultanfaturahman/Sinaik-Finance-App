@@ -6,7 +6,6 @@ import {
   ArrowDownToLine,
   Award,
   Settings,
-  NotebookPen,
   Sparkles,
   UserCircle,
 } from "lucide-react";
@@ -31,13 +30,6 @@ export const APP_ROUTES: AppRoute[] = [
     path: "/transactions",
     label: "Transaksi",
     icon: Receipt,
-    showInSidebar: true,
-    showInBottomNav: true,
-  },
-  {
-    path: "/notes",
-    label: "Catatan",
-    icon: NotebookPen,
     showInSidebar: true,
     showInBottomNav: true,
   },

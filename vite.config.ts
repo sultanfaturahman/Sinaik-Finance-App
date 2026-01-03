@@ -37,7 +37,7 @@ export default defineConfig(({ mode }) => ({
         navigateFallback: "/index.html",
         navigateFallbackAllowlist: [
           /^\/$/,
-          /^\/(auth|dashboard|transactions|notes|ai-strategy|reports|status|import-export|settings)(\/.*)?$/,
+          /^\/(auth|dashboard|transactions|ai-strategy|reports|status|import-export|settings)(\/.*)?$/,
         ],
         cleanupOutdatedCaches: true,
         clientsClaim: true,

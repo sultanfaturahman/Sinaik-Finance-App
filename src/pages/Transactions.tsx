@@ -1,7 +1,6 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Plus, Info, Settings, PlusCircle, X, NotebookPen } from 'lucide-react';
+import { Plus, Info, Settings, PlusCircle, X } from 'lucide-react';
 import { getSupabaseClient } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { AppShell } from '@/app/AppShell';
@@ -18,7 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { ListSkeleton } from '@/components/ui/ListSkeleton';
@@ -29,9 +27,6 @@ import type { Transaction } from '@/types/transaction';
 
 const ExcelImport = lazy(async () => ({
   default: (await import('@/components/ExcelImport')).ExcelImport,
-}));
-const ExcelExport = lazy(async () => ({
-  default: (await import('@/components/ExcelExport')).ExcelExport,
 }));
 const TransactionTable = lazy(async () => ({
   default: (await import('@/components/transactions/TransactionTable')).TransactionTable,
@@ -78,6 +73,7 @@ const Transactions = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { suggestions, addSuggestion, bulkAddSuggestions, removeSuggestion } = useCategorySuggestions();
+  const [tabsValue, setTabsValue] = useState<'transactions' | 'templates'>('transactions');
   const isMobile = useIsMobile();
 
   const [formData, setFormData] = useState({
@@ -250,7 +246,11 @@ const Transactions = () => {
       subtitle="Kelola pemasukan dan pengeluaran harian Anda"
       bottomAction={bottomAction}
     >
-      <Tabs defaultValue="transactions" className="space-y-6">
+      <Tabs
+        value={tabsValue}
+        onValueChange={(value) => setTabsValue(value as 'transactions' | 'templates')}
+        className="space-y-6"
+      >
         <TabsList>
           <TabsTrigger value="transactions">Daftar Transaksi</TabsTrigger>
           <TabsTrigger value="templates">Template</TabsTrigger>
@@ -258,59 +258,24 @@ const Transactions = () => {
 
         <TabsContent value="transactions" className="space-y-6">
           <div className="flex min-w-0 flex-col gap-6">
-            <Section
-              title="Catatan Harian / Bulanan"
-              description="Ringkasan cepat kini dipindahkan ke modul Catatan agar tidak bercampur dengan transaksi manual atau impor."
-              actions={
-                <Button asChild variant="outline" className="gap-2">
-                  <Link to="/notes">
-                    <NotebookPen className="h-4 w-4" />
-                    <span>Buka Modul Catatan</span>
-                  </Link>
-                </Button>
-              }
-            >
-              <Alert className="border-dashed border-brand/30 bg-brand/5">
-                <Info className="h-4 w-4 text-brand" />
-                <AlertDescription className="text-sm text-muted-foreground">
-                  Gunakan tombol di atas untuk menyimpan ringkasan pemasukan/pengeluaran tanpa mengganggu transaksi.
-                </AlertDescription>
-              </Alert>
-            </Section>
-
-            <Section
-              title="Aksi Cepat"
-              description="Gunakan import untuk upload massal atau export untuk backup laporan."
-              actions={
-                <div className="grid grid-cols-1 gap-2 md:flex md:items-center">
-                  <Suspense
-                    fallback={
-                      <ButtonSkeleton label="Memuat Export..." className="w-full md:w-auto" />
-                    }
-                  >
-                    <ExcelExport className="w-full md:w-auto" />
-                  </Suspense>
-                  <Suspense
-                    fallback={
-                      <ButtonSkeleton label="Memuat Import..." className="w-full md:w-auto" />
-                    }
-                  >
-                    <ExcelImport
-                      onImportComplete={fetchTransactions}
-                      onCategoriesImported={bulkAddSuggestions}
-                    />
-                  </Suspense>
-                </div>
-              }
-            >
-              <Alert className="border-primary/20 bg-primary/5">
-                <Info className="h-4 w-4 text-primary" />
-                <AlertDescription className="text-sm text-muted-foreground">
-                  <strong>Tips:</strong> Sistem otomatis mendeteksi duplikat berdasarkan tanggal, jenis,
-                  kategori, dan jumlah yang sama.
-                </AlertDescription>
-              </Alert>
-            </Section>
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <Suspense
+                fallback={<ButtonSkeleton label="Memuat Import..." className="w-full md:w-auto" />}
+              >
+                <ExcelImport
+                  onImportComplete={fetchTransactions}
+                  onCategoriesImported={bulkAddSuggestions}
+                />
+              </Suspense>
+              <Button
+                variant="outline"
+                className="w-full gap-2 md:w-auto"
+                onClick={() => setTabsValue('templates')}
+              >
+                <PlusCircle className="h-4 w-4" />
+                <span>Kelola Template</span>
+              </Button>
+            </div>
 
             <Section
               title="Daftar Transaksi"
