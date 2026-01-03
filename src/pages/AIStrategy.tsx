@@ -1,7 +1,10 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Sparkles, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { AppShell } from '@/app/AppShell';
+const AppShell = lazy(async () => {
+  const module = await import('@/app/AppShell');
+  return { default: module.AppShell };
+});
 import { getSupabaseClient } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useFinancialSnapshot } from '@/hooks/useFinancialSnapshot';
@@ -14,7 +17,10 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { StrategyInputForm } from '@/components/ai/StrategyInputForm';
+const StrategyInputForm = lazy(async () => {
+  const module = await import('@/components/ai/StrategyInputForm');
+  return { default: module.StrategyInputForm };
+});
 import {
   createDefaultStrategyFormState,
   normalizeStrategyPlan,
@@ -463,10 +469,11 @@ const AIStrategy = () => {
   const summaryToDisplay = storedSnapshot ?? snapshot ?? null;
 
   return (
-    <AppShell
-      title="AI Strategi Bisnis"
-      subtitle="Dapatkan rekomendasi strategi berdasarkan analisis data usaha Anda"
-    >
+    <Suspense fallback={<PageScaffoldFallback />}>
+      <AppShell
+        title="AI Strategi Bisnis"
+        subtitle="Dapatkan rekomendasi strategi berdasarkan analisis data usaha Anda"
+      >
       <div className="flex min-w-0 flex-col gap-6">
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
         <CardHeader>
@@ -577,15 +584,17 @@ const AIStrategy = () => {
         </CardContent>
       </Card>
 
-      <StrategyInputForm
-        value={formState}
-        onChange={(next) => {
-          setFormState(next);
-          setFormTouched(true);
-        }}
-        disabled={loading}
-        onTouch={() => setFormTouched(true)}
-      />
+      <Suspense fallback={<StrategyFormFallback />}>
+        <StrategyInputForm
+          value={formState}
+          onChange={(next) => {
+            setFormState(next);
+            setFormTouched(true);
+          }}
+          disabled={loading}
+          onTouch={() => setFormTouched(true)}
+        />
+      </Suspense>
 
       {strategy && (
         <div className="space-y-6">
@@ -886,6 +895,7 @@ const AIStrategy = () => {
       )}
       </div>
     </AppShell>
+    </Suspense>
   );
 };
 
@@ -912,3 +922,28 @@ const isFinancialSnapshot = (value: unknown): value is StrategyFinancialSnapshot
   }
   return Array.isArray(value.monthlyTrends);
 };
+
+const PageScaffoldFallback = () => (
+  <div className="px-4 py-10">
+    <div className="space-y-4">
+      <div className="h-10 w-2/3 rounded-2xl bg-muted animate-pulse" />
+      <div className="h-6 w-1/2 rounded-2xl bg-muted/70 animate-pulse" />
+    </div>
+    <div className="mt-6 space-y-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div key={`hero-skeleton-${index}`} className="h-28 rounded-2xl bg-muted/70 animate-pulse" />
+      ))}
+    </div>
+  </div>
+);
+
+const StrategyFormFallback = () => (
+  <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 p-6">
+    <div className="h-6 w-48 rounded-lg bg-muted animate-pulse" />
+    <div className="mt-4 grid gap-3 md:grid-cols-2">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div key={`form-skeleton-${index}`} className="h-12 rounded-xl bg-muted/70 animate-pulse" />
+      ))}
+    </div>
+  </div>
+);
