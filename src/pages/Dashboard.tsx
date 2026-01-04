@@ -8,7 +8,6 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { Section } from "@/components/ui/Section";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useCategorySuggestions } from "@/hooks/useCategorySuggestions";
-import { SignOutButton } from "@/components/SignOutButton";
 import { Skeleton } from "@/components/ui/skeleton";
 const OnboardingWizard = lazy(() => import("@/components/OnboardingWizard"));
 
@@ -124,19 +123,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <AppShell
-      title="Dashboard"
-      subtitle="Ringkasan terkini performa usaha Anda"
-      headerActions={
-        <SignOutButton
-          iconOnly
-          buttonVariant="ghost"
-          aria-label="Keluar dari akun"
-          iconClassName="text-muted-foreground"
-          className="text-muted-foreground hover:text-destructive"
-        />
-      }
-    >
+    <AppShell title="Dashboard" subtitle="Ringkasan terkini performa usaha Anda">
       {showOnboarding && (
         <Suspense fallback={<OnboardingWizardFallback />}>
           <OnboardingWizard

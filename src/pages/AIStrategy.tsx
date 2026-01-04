@@ -8,6 +8,7 @@ const AppShell = lazy(async () => {
 import { getSupabaseClient } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useFinancialSnapshot } from '@/hooks/useFinancialSnapshot';
+import { useProfile } from '@/hooks/useProfile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -123,6 +124,7 @@ const AIStrategy = () => {
   const shouldParseMarkdown = showRawStrategy && detailView === 'sections';
 
   const { snapshot, loading: _snapshotLoading, error: snapshotError } = useFinancialSnapshot();
+  const { data: profile } = useProfile();
 
   const markdownSections = useMemo(() => {
     if (!rawStrategy || !shouldParseMarkdown) {
@@ -236,7 +238,9 @@ const AIStrategy = () => {
         ...current.profile,
         businessName:
           current.profile.businessName ||
+          profile?.business_name ||
           (user?.user_metadata?.business_name as string | undefined) ||
+          profile?.name ||
           (user?.user_metadata?.name as string | undefined) ||
           user?.email?.split('@')[0] ||
           '',
@@ -262,7 +266,7 @@ const AIStrategy = () => {
       },
       goals: current.goals,
     }));
-  }, [snapshot, formTouched, user?.user_metadata, user?.email]);
+  }, [snapshot, formTouched, user?.user_metadata, user?.email, profile?.business_name, profile?.name]);
 
   useEffect(() => {
     if (!user?.id || !strategy) return;
@@ -641,11 +645,6 @@ const AIStrategy = () => {
                   <div key={item.id} className="rounded-lg border bg-background p-4 space-y-2">
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="text-base font-semibold text-foreground">{item.title}</h3>
-                      {item.expected_impact && (
-                        <Badge variant="outline" className="text-xs">
-                          Dampak: {item.expected_impact}
-                        </Badge>
-                      )}
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {item.description}

@@ -235,6 +235,7 @@ const Transactions = () => {
       Tambah Transaksi
     </Button>
   ) : undefined;
+  const hasTransactions = transactions.length > 0;
 
   return (
     <AppShell
@@ -243,31 +244,39 @@ const Transactions = () => {
       bottomAction={bottomAction}
     >
       <div className="flex min-w-0 flex-col gap-6">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <Suspense
-            fallback={<ButtonSkeleton label="Memuat Import..." className="w-full lg:w-auto" />}
-          >
-            <ExcelImport
-              onImportComplete={fetchTransactions}
-              onCategoriesImported={bulkAddSuggestions}
-            />
-          </Suspense>
-          <Suspense
-            fallback={<ButtonSkeleton label="Memuat Export..." className="w-full lg:w-auto" />}
-          >
-            <ExcelExport className="w-full lg:w-auto" />
-          </Suspense>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            <Suspense
+              fallback={<ButtonSkeleton label="Memuat Import..." className="w-full lg:w-auto" />}
+            >
+              <ExcelImport
+                onImportComplete={fetchTransactions}
+                onCategoriesImported={bulkAddSuggestions}
+              />
+            </Suspense>
+            <Suspense
+              fallback={<ButtonSkeleton label="Memuat Export..." className="w-full lg:w-auto" />}
+            >
+              <ExcelExport />
+            </Suspense>
+          </div>
+          {!isMobile && !hasTransactions && (
+            <Button onClick={() => setDialogOpen(true)} className="w-full lg:w-auto gap-2">
+              <Plus className="h-4 w-4" />
+              <span>Tambah Transaksi</span>
+            </Button>
+          )}
         </div>
 
         <Section
           title="Daftar Transaksi"
           actions={
-            !isMobile && (
+            !isMobile && hasTransactions ? (
               <Button onClick={() => setDialogOpen(true)} className="gap-2">
                 <Plus className="h-4 w-4" />
                 <span>Tambah Transaksi</span>
               </Button>
-            )
+            ) : undefined
           }
         >
               {loading ? (
@@ -281,28 +290,11 @@ const Transactions = () => {
                     </Button>
                   }
                 />
-              ) : transactions.length === 0 ? (
+              ) : !hasTransactions ? (
                 <EmptyState
                   icon={<Info className="h-5 w-5" />}
                   title="Belum ada transaksi"
-                  description="Tambahkan transaksi manual atau import dari Excel untuk mulai memantau arus kas."
-                  action={
-                    <>
-                      <Button onClick={() => setDialogOpen(true)} className="w-full">
-                        Tambah Manual
-                      </Button>
-                      <Suspense
-                        fallback={
-                          <ButtonSkeleton label="Memuat Import..." className="w-full" />
-                        }
-                      >
-                        <ExcelImport
-                          onImportComplete={fetchTransactions}
-                          onCategoriesImported={bulkAddSuggestions}
-                        />
-                      </Suspense>
-                    </>
-                  }
+                  description="Gunakan tombol aksi untuk menambahkan atau mengimpor transaksi pertama Anda."
                 />
               ) : (
                 <>

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { loadXlsx } from '@/lib/loadXlsx';
+import { cn } from '@/lib/utils';
 
 interface ExcelRow {
   tanggal: string;
@@ -27,13 +28,13 @@ interface ParsedTransaction {
   error?: string;
 }
 
-export const ExcelImport = ({
-  onImportComplete,
-  onCategoriesImported,
-}: {
+interface ExcelImportProps {
   onImportComplete: () => void;
   onCategoriesImported?: (categories: string[]) => void;
-}) => {
+  className?: string;
+}
+
+export const ExcelImport = ({ onImportComplete, onCategoriesImported, className }: ExcelImportProps) => {
   const { user } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [parsedData, setParsedData] = useState<ParsedTransaction[]>([]);
@@ -258,10 +259,10 @@ export const ExcelImport = ({
 
   return (
     <>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className={cn('flex w-full flex-col gap-2 sm:flex-row sm:items-center lg:w-auto', className)}>
         <Button variant="outline" onClick={downloadTemplate} className="w-full sm:w-auto">
           <Upload className="h-4 w-4 mr-2" />
-          Download Template
+          Download Template Excel
         </Button>
         <div className="relative w-full sm:w-auto">
           <input

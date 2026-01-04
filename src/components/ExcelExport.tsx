@@ -4,6 +4,7 @@ import { Button, type ButtonProps } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { loadXlsx } from '@/lib/loadXlsx';
+import { cn } from '@/lib/utils';
 
 export const ExcelExport = ({ className, ...buttonProps }: ButtonProps) => {
   const { user } = useAuth();
@@ -74,7 +75,7 @@ export const ExcelExport = ({ className, ...buttonProps }: ButtonProps) => {
     <Button
       variant="outline"
       onClick={handleExport}
-      className={className}
+      className={cn('w-full lg:w-auto', className)}
       {...buttonProps}
     >
       <Download className="h-4 w-4 mr-2" />
