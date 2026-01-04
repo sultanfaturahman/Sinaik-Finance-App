@@ -96,7 +96,7 @@ const Brand = () => {
   return (
     <div className="flex items-center gap-4">
       <img
-        src="/sinaik_logo_1 1 (1).png"
+        src="/pwa-192x192.png"
         alt="SiNaik"
         className="h-14 w-14 rounded-1xl object-contain"
       />
