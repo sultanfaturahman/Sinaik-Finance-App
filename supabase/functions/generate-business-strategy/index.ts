@@ -1,3 +1,4 @@
+import type {} from "./globals";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
@@ -19,6 +20,7 @@ interface StrategyTask {
   title: string;
   owner?: string;
   metric?: string;
+  timeframe?: string;
 }
 
 interface StrategyStep {
@@ -38,6 +40,10 @@ interface StrategyPlan {
   cost_strategies: StrategyItem[];
   action_plan: StrategyStep[];
   targets: Array<{ label: string; value: string }>;
+  key_focus?: string[];
+  actions?: StrategyTask[];
+  timeframe?: string;
+  version?: string;
 }
 
 interface StrategyProfileInput {
@@ -390,7 +396,7 @@ Berikan strategi JSON sesuai format di atas untuk membantu UMKM mencapai target.
   return { systemPrompt, userPrompt };
 };
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

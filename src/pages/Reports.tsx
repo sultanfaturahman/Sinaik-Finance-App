@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import {
   TrendingUp,
   TrendingDown,
@@ -20,6 +20,9 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+const ExcelExport = lazy(async () => ({
+  default: (await import('@/components/ExcelExport')).ExcelExport,
+}));
 
 interface MonthlyReport {
   monthLabel: string;
@@ -173,11 +176,24 @@ const Reports = () => {
         />
       ) : (
         <div className="flex flex-col gap-6">
-          <ReportFilters
-            years={years}
-            selectedYear={selectedYear}
-            onYearChange={setSelectedYear}
-          />
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="w-full md:flex-1">
+              <ReportFilters
+                years={years}
+                selectedYear={selectedYear}
+                onYearChange={setSelectedYear}
+              />
+            </div>
+            <Suspense
+              fallback={
+                <Button className="w-full md:w-auto" variant="outline" disabled>
+                  Menyiapkan Export...
+                </Button>
+              }
+            >
+              <ExcelExport className="w-full md:w-auto" />
+            </Suspense>
+          </div>
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <StatCard

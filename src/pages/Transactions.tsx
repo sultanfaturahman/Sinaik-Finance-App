@@ -22,20 +22,19 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { ListSkeleton } from '@/components/ui/ListSkeleton';
 import { useCategorySuggestions } from '@/hooks/useCategorySuggestions';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Transaction } from '@/types/transaction';
 
 const ExcelImport = lazy(async () => ({
   default: (await import('@/components/ExcelImport')).ExcelImport,
+}));
+const ExcelExport = lazy(async () => ({
+  default: (await import('@/components/ExcelExport')).ExcelExport,
 }));
 const TransactionTable = lazy(async () => ({
   default: (await import('@/components/transactions/TransactionTable')).TransactionTable,
 }));
 const TransactionItemCard = lazy(async () => ({
   default: (await import('@/components/transactions/TransactionItemCard')).TransactionItemCard,
-}));
-const TemplateList = lazy(async () => ({
-  default: (await import('@/components/transactions/TemplateList')).TemplateList,
 }));
 const BulkOperationsToolbar = lazy(async () => ({
   default: (await import('@/components/transactions/BulkOperationsToolbar')).BulkOperationsToolbar,
@@ -59,8 +58,6 @@ const MobileTransactionsFallback = ({ count = 3 }: { count?: number }) => (
   </div>
 );
 
-const TemplateListFallback = () => <ListSkeleton rows={3} columns={3} />;
-
 const Transactions = () => {
   const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -73,7 +70,6 @@ const Transactions = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { suggestions, addSuggestion, bulkAddSuggestions, removeSuggestion } = useCategorySuggestions();
-  const [tabsValue, setTabsValue] = useState<'transactions' | 'templates'>('transactions');
   const isMobile = useIsMobile();
 
   const [formData, setFormData] = useState({
@@ -246,48 +242,34 @@ const Transactions = () => {
       subtitle="Kelola pemasukan dan pengeluaran harian Anda"
       bottomAction={bottomAction}
     >
-      <Tabs
-        value={tabsValue}
-        onValueChange={(value) => setTabsValue(value as 'transactions' | 'templates')}
-        className="space-y-6"
-      >
-        <TabsList>
-          <TabsTrigger value="transactions">Daftar Transaksi</TabsTrigger>
-          <TabsTrigger value="templates">Template</TabsTrigger>
-        </TabsList>
+      <div className="flex min-w-0 flex-col gap-6">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <Suspense
+            fallback={<ButtonSkeleton label="Memuat Import..." className="w-full lg:w-auto" />}
+          >
+            <ExcelImport
+              onImportComplete={fetchTransactions}
+              onCategoriesImported={bulkAddSuggestions}
+            />
+          </Suspense>
+          <Suspense
+            fallback={<ButtonSkeleton label="Memuat Export..." className="w-full lg:w-auto" />}
+          >
+            <ExcelExport className="w-full lg:w-auto" />
+          </Suspense>
+        </div>
 
-        <TabsContent value="transactions" className="space-y-6">
-          <div className="flex min-w-0 flex-col gap-6">
-            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-              <Suspense
-                fallback={<ButtonSkeleton label="Memuat Import..." className="w-full md:w-auto" />}
-              >
-                <ExcelImport
-                  onImportComplete={fetchTransactions}
-                  onCategoriesImported={bulkAddSuggestions}
-                />
-              </Suspense>
-              <Button
-                variant="outline"
-                className="w-full gap-2 md:w-auto"
-                onClick={() => setTabsValue('templates')}
-              >
-                <PlusCircle className="h-4 w-4" />
-                <span>Kelola Template</span>
+        <Section
+          title="Daftar Transaksi"
+          actions={
+            !isMobile && (
+              <Button onClick={() => setDialogOpen(true)} className="gap-2">
+                <Plus className="h-4 w-4" />
+                <span>Tambah Transaksi</span>
               </Button>
-            </div>
-
-            <Section
-              title="Daftar Transaksi"
-              actions={
-                !isMobile && (
-                  <Button onClick={() => setDialogOpen(true)} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    <span>Tambah Transaksi</span>
-                  </Button>
-                )
-              }
-            >
+            )
+          }
+        >
               {loading ? (
                 <ListSkeleton rows={5} columns={7} />
               ) : error ? (
@@ -368,15 +350,7 @@ const Transactions = () => {
                 </>
               )}
             </Section>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="templates">
-          <Suspense fallback={<TemplateListFallback />}>
-            <TemplateList onTransactionCreated={fetchTransactions} />
-          </Suspense>
-        </TabsContent>
-      </Tabs>
+      </div>
 
       <TransactionDialog
         open={dialogOpen}

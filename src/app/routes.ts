@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Receipt,
   FileBarChart,
-  ArrowDownToLine,
   Award,
   Settings,
   Sparkles,
@@ -40,12 +39,6 @@ export const APP_ROUTES: AppRoute[] = [
     showInSidebar: true,
   },
  
-  {
-    path: "/import-export",
-    label: "Import / Export",
-    icon: ArrowDownToLine,
-    showInSidebar: true,
-  },
   {
     path: "/reports",
     label: "Laporan",

@@ -51,7 +51,6 @@ const DesktopSidebar = () => {
           );
         })}
       </nav>
-      <FooterNote />
     </aside>
   );
 };
@@ -82,7 +81,6 @@ const MobileSidebar = ({ openMobile, onOpenChange }: SidebarDrawerProps) => (
             );
           })}
         </nav>
-        <FooterNote className="mt-auto" />
       </div>
     </SheetContent>
   </Sheet>
@@ -109,10 +107,3 @@ const Brand = () => {
     </div>
   );
 };
-
-const FooterNote = ({ className }: { className?: string }) => (
-  <div className={cn("rounded-xl border border-dashed border-border/80 p-3 text-xs text-muted-foreground", className)}>
-    <p className="font-medium text-foreground">Tips:</p>
-    <p>Gunakan tombol tambah di bawah untuk mencatat transaksi harian lebih cepat.</p>
-  </div>
-);
