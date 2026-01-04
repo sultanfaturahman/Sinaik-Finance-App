@@ -51,6 +51,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /// <reference path="./globals.d.ts" />
 var server_ts_1 = require("https://deno.land/std@0.168.0/http/server.ts");
 var supabase_js_2_39_3_1 = require("https://esm.sh/@supabase/supabase-js@2.39.3");
+var DAILY_STRATEGY_LIMIT = 10;
 var corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -418,8 +419,10 @@ var buildPrompts = function (profile, financialSummary, goals) {
                 if (countError) {
                     console.error("Failed to count daily runs", countError);
                 }
-                else if ((todayCount !== null && todayCount !== void 0 ? todayCount : 0) >= 3) {
-                    return [2 /*return*/, new Response(JSON.stringify({ error: "Batas harian tercapai. Coba lagi besok." }), { status: 429, headers: __assign(__assign({}, corsHeaders), { "Content-Type": "application/json" }) })];
+                else if ((todayCount !== null && todayCount !== void 0 ? todayCount : 0) >= DAILY_STRATEGY_LIMIT) {
+                    return [2 /*return*/, new Response(JSON.stringify({
+                            error: "Batas harian tercapai. Coba lagi besok atau hubungi admin untuk meningkatkan limit (maks ".concat(DAILY_STRATEGY_LIMIT, " kali/hari)."),
+                        }), { status: 429, headers: __assign(__assign({}, corsHeaders), { "Content-Type": "application/json" }) })];
                 }
                 return [4 /*yield*/, fetch("https://generativelanguage.googleapis.com/v1beta/models/".concat(geminiModel, ":generateContent?key=").concat(geminiApiKey), {
                         method: "POST",

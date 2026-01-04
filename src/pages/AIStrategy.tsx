@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Sparkles, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { FunctionsHttpError } from '@supabase/supabase-js';
 const AppShell = lazy(async () => {
   const module = await import('@/app/AppShell');
   return { default: module.AppShell };
@@ -98,6 +99,50 @@ const parseMarkdownSections = (markdown: string): MarkdownSection[] => {
   pushSection();
 
   return sections;
+};
+
+const parseFunctionInvokeError = async (
+  error: unknown,
+): Promise<{ status?: number; message?: string }> => {
+  if (error instanceof FunctionsHttpError) {
+    const response = error.context as Response | undefined;
+    if (response) {
+      const status = response.status;
+      try {
+        const bodyText = await response.clone().text();
+        if (bodyText) {
+          try {
+            const parsed = JSON.parse(bodyText) as { error?: unknown; message?: unknown };
+            if (typeof parsed?.error === 'string') {
+              return { status, message: parsed.error };
+            }
+            if (typeof parsed?.message === 'string') {
+              return { status, message: parsed.message };
+            }
+            if (typeof parsed === 'string') {
+              return { status, message: parsed };
+            }
+            return { status, message: bodyText };
+          } catch {
+            return { status, message: bodyText };
+          }
+        }
+      } catch {
+        // ignore body parse errors
+      }
+      return { status, message: error.message };
+    }
+  }
+
+  if (error instanceof Error) {
+    return { message: error.message };
+  }
+
+  if (typeof error === 'string' && error.trim()) {
+    return { message: error };
+  }
+
+  return {};
 };
 
 const makePlanVersion = (steps: StrategyStep[]) =>
@@ -400,12 +445,16 @@ const AIStrategy = () => {
       if (error) {
         console.error('Error invoking function:', error);
 
-        if (error.message?.includes('429') || error.message?.includes('rate limit')) {
-          toast.error('Rate limit tercapai. Silakan coba lagi dalam beberapa saat.');
-        } else if (error.message?.includes('402') || error.message?.includes('kredit')) {
-          toast.error('Kredit AI habis. Silakan hubungi admin untuk menambah kuota.');
+        const { status: errorStatus, message: detailedMessage } = await parseFunctionInvokeError(error);
+
+        if (errorStatus === 429) {
+          toast.error(detailedMessage ?? 'Rate limit tercapai. Silakan coba lagi dalam beberapa saat.');
+        } else if (errorStatus === 402) {
+          toast.error(detailedMessage ?? 'Kredit AI habis. Silakan hubungi admin untuk menambah kuota.');
+        } else if (errorStatus === 401) {
+          toast.error(detailedMessage ?? 'Sesi berakhir. Silakan masuk kembali.');
         } else {
-          toast.error('Gagal menghasilkan strategi: ' + error.message);
+          toast.error(detailedMessage ?? 'Gagal menghasilkan strategi. Silakan coba lagi.');
         }
         return;
       }

@@ -91,6 +91,8 @@ interface StrategyRunRow {
   model: string | null;
 }
 
+const DAILY_STRATEGY_LIMIT = 10;
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -515,9 +517,11 @@ serve(async (req: Request) => {
 
     if (countError) {
       console.error("Failed to count daily runs", countError);
-    } else if ((todayCount ?? 0) >= 3) {
+    } else if ((todayCount ?? 0) >= DAILY_STRATEGY_LIMIT) {
       return new Response(
-        JSON.stringify({ error: "Batas harian tercapai. Coba lagi besok." }),
+        JSON.stringify({
+          error: `Batas harian tercapai. Coba lagi besok atau hubungi admin untuk meningkatkan limit (maks ${DAILY_STRATEGY_LIMIT} kali/hari).`,
+        }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
