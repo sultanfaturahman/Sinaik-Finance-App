@@ -1,4 +1,5 @@
-import type {} from "./globals";
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./globals.d.ts" />
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
@@ -84,9 +85,16 @@ interface StrategyCacheRow {
   created_at: string;
 }
 
+interface StrategyRunRow {
+  id: string;
+  created_at: string;
+  model: string | null;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 const sanitizeJsonContent = (content: string) => {
@@ -398,7 +406,7 @@ Berikan strategi JSON sesuai format di atas untuk membantu UMKM mencapai target.
 
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { status: 204, headers: corsHeaders });
   }
 
   try {
@@ -589,7 +597,7 @@ serve(async (req: Request) => {
         { onConflict: "user_id,payload_hash" },
       )
       .select("id, created_at, model")
-      .single();
+      .single<StrategyRunRow>();
 
     if (upsertError) {
       console.error("Failed to upsert ai_strategy_runs", upsertError);
