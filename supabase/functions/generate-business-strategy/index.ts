@@ -406,7 +406,7 @@ Berikan strategi JSON sesuai format di atas untuk membantu UMKM mencapai target.
 
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
-    return new Response("ok", { status: 204, headers: corsHeaders });
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
