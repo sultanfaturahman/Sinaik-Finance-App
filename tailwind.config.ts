@@ -20,10 +20,6 @@ export default {
           DEFAULT: "#F59E0B",
           foreground: "#FEF3C7",
         },
-        destructive: {
-          DEFAULT: "#EF4444",
-          foreground: "#FEF2F2",
-        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -36,10 +32,6 @@ export default {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",

@@ -31,6 +31,7 @@ import type {
   StrategyPlan,
   StrategyFinancialSnapshot,
   StrategyFormState,
+  StrategyStep,
 } from '@/types/strategy';
 
 const MarkdownRenderer = lazy(async () => ({

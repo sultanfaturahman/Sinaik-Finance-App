@@ -323,6 +323,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_dashboard_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: Array<{
+          total_income: number | null
+          total_expense: number | null
+          net_profit: number | null
+          transaction_count: number | null
+        }>
+      }
     }
     Enums: {
       app_role: "admin" | "owner" | "cashier"

@@ -48,13 +48,15 @@ const Dashboard = () => {
 
       try {
         const supabase = await getSupabaseClient();
-        const { data, error } = await supabase.rpc<DashboardStatsRow>("get_dashboard_stats");
+        const { data, error } = await supabase.rpc("get_dashboard_stats");
 
         if (error) {
           throw error;
         }
 
-        const statsRow = Array.isArray(data) ? data[0] : data;
+        const statsRow: DashboardStatsRow | undefined = Array.isArray(data)
+          ? data[0]
+          : (data as DashboardStatsRow | null) ?? undefined;
 
         if (!active) return;
 

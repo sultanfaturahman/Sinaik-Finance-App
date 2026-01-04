@@ -24,7 +24,7 @@ declare module "https://deno.land/std@0.168.0/http/server.ts" {
 }
 
 declare module "https://esm.sh/@supabase/supabase-js@2.39.3" {
-  export * from "@supabase/supabase-js";
+  export * from "../../../node_modules/@supabase/supabase-js/dist/module/index";
 }
 
 declare const Deno: {
