@@ -30,7 +30,7 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-border p-4">
         <div className="flex items-center gap-3">
           <img
-            src="/sinaik_logo_1 1 (1).png"
+            src="/pwa-192x192.png"
             alt="SiNaik"
             className="h-12 w-12 rounded-xl object-contain"
           />
