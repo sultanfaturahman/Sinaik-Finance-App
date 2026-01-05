@@ -91,7 +91,7 @@ interface StrategyRunRow {
   model: string | null;
 }
 
-const DAILY_STRATEGY_LIMIT = 10;
+const DAILY_STRATEGY_LIMIT = 50;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -415,7 +415,7 @@ serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
-    const geminiModel = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
+    const geminiModel = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash-lite";
 
     if (!supabaseUrl || !supabaseKey || !geminiApiKey) {
       throw new Error(
@@ -526,40 +526,65 @@ serve(async (req: Request) => {
       );
     }
 
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: {
-            role: "system",
-            parts: [{ text: systemPrompt }],
-          },
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: userPrompt }],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: strategyResponseSchema,
-          },
-        }),
-      },
-    );
+    // Retry logic for Gemini rate limits
+    const MAX_RETRIES = 3;
+    const INITIAL_DELAY_MS = 2000;
+    let geminiResponse: Response | null = null;
+    let lastError = "";
 
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text();
-      if (geminiResponse.status === 429 || geminiResponse.status === 402) {
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: {
+              role: "system",
+              parts: [{ text: systemPrompt }],
+            },
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: userPrompt }],
+              },
+            ],
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseSchema: strategyResponseSchema,
+            },
+          }),
+        },
+      );
+
+      if (geminiResponse.ok) {
+        break;
+      }
+
+      lastError = await geminiResponse.text();
+
+      // If rate limited (429), wait and retry
+      if (geminiResponse.status === 429 && attempt < MAX_RETRIES - 1) {
+        const delayMs = INITIAL_DELAY_MS * Math.pow(2, attempt);
+        console.log(`Gemini rate limited, retrying in ${delayMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        continue;
+      }
+
+      // For other errors or final retry, break out
+      break;
+    }
+
+    if (!geminiResponse || !geminiResponse.ok) {
+      const status = geminiResponse?.status ?? 500;
+      if (status === 429 || status === 402) {
         return new Response(
-          JSON.stringify({ error: "Limit penggunaan AI tercapai. Coba lagi nanti." }),
-          { status: geminiResponse.status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          JSON.stringify({ error: "Limit penggunaan AI tercapai. Silakan tunggu 1-2 menit dan coba lagi." }),
+          { status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      console.error("Gemini error:", geminiResponse.status, errorText);
-      throw new Error(`Gemini error: ${errorText}`);
+      console.error("Gemini error:", status, lastError);
+      throw new Error(`Gemini error: ${lastError}`);
     }
 
     const geminiData = await geminiResponse.json();
