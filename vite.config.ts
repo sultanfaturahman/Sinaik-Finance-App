@@ -23,9 +23,10 @@ export default defineConfig(({ mode }) => ({
         scope: "/",
         start_url: "/",
         icons: [
-          { src: "/pwa-192x192.png", sizes: "192x192", type: "image/png" },
-          { src: "/pwa-512x512.png", sizes: "512x512", type: "image/png" },
+          { src: "/pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+          { src: "/pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },
           { src: "/pwa-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+          { src: "/pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
         ],
         shortcuts: [
           { name: "Catat Transaksi", short_name: "Transaksi", url: "/transactions", icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }] },
@@ -59,6 +60,7 @@ export default defineConfig(({ mode }) => ({
       devOptions: {
         enabled: mode === "development",
         navigateFallback: "index.html",
+        suppressWarnings: true,
       },
     }),
   ].filter(Boolean),
