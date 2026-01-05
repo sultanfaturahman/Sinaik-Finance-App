@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Smartphone, X } from 'lucide-react';
 
 const emailSchema = z.string().email('Email tidak valid');
 const passwordSchema = z.string().min(6, 'Password minimal 6 karakter');
@@ -20,10 +21,24 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const [loginNotice, setLoginNotice] = useState<string | null>(null);
+  const [showPwaBanner, setShowPwaBanner] = useState(false);
 
   // Login state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+
+  // Check if user should see PWA banner (mobile + not in PWA + came from email)
+  useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+      || (navigator as { standalone?: boolean }).standalone === true;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const searchParams = new URLSearchParams(location.search);
+    const isFromEmail = searchParams.get('verified') === '1' || location.hash.includes('type=signup');
+    
+    if (isMobile && !isStandalone && isFromEmail) {
+      setShowPwaBanner(true);
+    }
+  }, [location]);
 
   // Register state
   const [registerName, setRegisterName] = useState('');
@@ -119,7 +134,27 @@ const Auth = () => {
   }, [location]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
+      {/* PWA Install Banner for mobile users coming from email */}
+      {showPwaBanner && (
+        <div className="mb-4 w-full max-w-sm animate-in slide-in-from-top-2">
+          <Alert className="relative border-primary/50 bg-primary/10">
+            <Smartphone className="h-4 w-4" />
+            <AlertDescription className="pr-6 text-sm">
+              <strong>Sudah install aplikasi SiNaik?</strong>
+              <br />
+              Buka aplikasi SiNaik di layar utama HP Anda untuk pengalaman terbaik.
+            </AlertDescription>
+            <button
+              onClick={() => setShowPwaBanner(false)}
+              className="absolute right-2 top-2 rounded-full p-1 hover:bg-primary/10"
+              aria-label="Tutup"
+            >
+              <X className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </Alert>
+        </div>
+      )}
       <Card className="w-full max-w-sm shadow-lg">
         <CardHeader className="text-center space-y-3">
           <img src="/pwa-192x192.png" alt="SiNaik" className="mx-auto h-20 w-20 object-contain" />
