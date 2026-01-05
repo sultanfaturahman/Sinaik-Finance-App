@@ -273,30 +273,37 @@ const Status = () => {
 
         <Section title="Semua Level UMKM">
           <div className="space-y-3">
-            {UMKM_RULES.map((rule) => (
-              <div
-                key={rule.level}
-                className="flex items-center justify-between rounded-2xl border bg-background px-4 py-4 transition-colors"
-                style={{
-                  borderColor:
-                    rule.level === currentClassification.level ? rule.color : "transparent",
-                  backgroundColor:
-                    rule.level === currentClassification.level ? `${rule.color}10` : undefined,
-                }}
-              >
-                <div>
-                  <p className="font-semibold" style={{ color: rule.color }}>
-                    {rule.label}
-                  </p>
-                  <p className="text-sm text-muted-foreground">{rule.description}</p>
+            {UMKM_RULES.map((rule) => {
+              const isCurrentLevel = rule.level === currentClassification.level;
+              return (
+                <div
+                  key={rule.level}
+                  className={`flex items-center justify-between rounded-2xl border-2 px-4 py-4 transition-colors ${
+                    isCurrentLevel
+                      ? "border-primary bg-primary/10"
+                      : "border-transparent bg-background"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-full"
+                      style={{ backgroundColor: rule.color }}
+                    />
+                    <div>
+                      <p className={`font-semibold ${isCurrentLevel ? "text-foreground" : "text-foreground/80"}`}>
+                        {rule.label}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{rule.description}</p>
+                    </div>
+                  </div>
+                  {isCurrentLevel && (
+                    <span className="shrink-0 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+                      Level Saat Ini
+                    </span>
+                  )}
                 </div>
-                {rule.level === currentClassification.level && (
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                    Level Saat Ini
-                  </span>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Section>
       </div>
