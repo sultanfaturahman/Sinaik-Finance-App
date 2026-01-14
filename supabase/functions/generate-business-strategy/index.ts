@@ -90,9 +90,6 @@ interface StrategyRunRow {
   created_at: string;
   model: string | null;
 }
-
-const DAILY_STRATEGY_LIMIT = 50;
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -501,30 +498,37 @@ serve(async (req: Request) => {
       }
     }
 
+    const dailyLimitValue = Number(Deno.env.get("AI_STRATEGY_DAILY_LIMIT") ?? "0");
+    const dailyStrategyLimit =
+      Number.isFinite(dailyLimitValue) && dailyLimitValue > 0 ? dailyLimitValue : null;
+
+    if (dailyStrategyLimit) {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const { count: todayCount, error: countError } = await supabase
+        .from("ai_strategy_runs")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .gte("created_at", startOfDay.toISOString());
+
+      if (countError) {
+        console.error("Failed to count daily runs", countError);
+      } else if ((todayCount ?? 0) >= dailyStrategyLimit) {
+        return new Response(
+          JSON.stringify({
+            error: `Batas harian tercapai. Maksimal ${dailyStrategyLimit} kali per hari.`,
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+    }
+
     const { systemPrompt, userPrompt } = buildPrompts(
       payload.profile,
       payload.financialSummary,
       payload.goals,
     );
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const { count: todayCount, error: countError } = await supabase
-      .from("ai_strategy_runs")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .gte("created_at", startOfDay.toISOString());
-
-    if (countError) {
-      console.error("Failed to count daily runs", countError);
-    } else if ((todayCount ?? 0) >= DAILY_STRATEGY_LIMIT) {
-      return new Response(
-        JSON.stringify({
-          error: `Batas harian tercapai. Coba lagi besok atau hubungi admin untuk meningkatkan limit (maks ${DAILY_STRATEGY_LIMIT} kali/hari).`,
-        }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
 
     // Retry logic for Gemini rate limits
     const MAX_RETRIES = 3;

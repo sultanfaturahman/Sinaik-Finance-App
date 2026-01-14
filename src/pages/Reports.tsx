@@ -191,7 +191,7 @@ const Reports = () => {
                 </Button>
               }
             >
-              <ExcelExport className="w-full md:w-auto" />
+              <ExcelExport className="w-full md:w-auto" defaultYear={selectedYear} />
             </Suspense>
           </div>
 

@@ -106,7 +106,6 @@ const Transactions = () => {
 
   useEffect(() => {
     fetchTransactions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
