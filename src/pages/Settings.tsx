@@ -24,7 +24,7 @@ const Settings = () => {
     <AppShell title="Pengaturan" subtitle="Sesuaikan preferensi tampilan dan notifikasi">
       <div className="flex flex-col gap-6">
         <Section title="Tampilan" description="Sesuaikan tema dan pengalaman penggunaan.">
-          <div className="rounded-2xl border bg-background p-4">
+          <div className="rounded-xl border border-border/50 bg-card p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-foreground">Mode Gelap</p>
@@ -40,12 +40,12 @@ const Settings = () => {
               />
             </div>
           </div>
-          <div className="rounded-2xl border bg-background p-4">
-            <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+          <div className="rounded-xl border border-border/50 bg-card p-4">
+            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Bahasa aplikasi
             </Label>
             <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger className="mt-2 w-full">
+              <SelectTrigger className="mt-2 w-full rounded-xl">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -57,7 +57,7 @@ const Settings = () => {
         </Section>
 
         <Section title="Notifikasi" description="Atur ringkasan laporan yang ingin Anda terima.">
-          <div className="rounded-2xl border bg-background p-4">
+          <div className="rounded-xl border border-border/50 bg-card p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-foreground">Ringkasan mingguan</p>
@@ -76,16 +76,16 @@ const Settings = () => {
 
         <Section title="Keamanan" description="Kelola sesi dan data tersimpan di perangkat ini.">
           <div className="grid gap-3 md:grid-cols-2">
-            <Button variant="outline" className="h-auto justify-start rounded-2xl border-dashed bg-background px-4 py-3">
+            <Button variant="outline" className="h-auto justify-start rounded-xl border-dashed border-border/50 bg-card px-4 py-3 text-muted-foreground">
               Bersihkan cache perangkat
             </Button>
-            <Button variant="outline" className="h-auto justify-start rounded-2xl border-dashed bg-background px-4 py-3">
+            <Button variant="outline" className="h-auto justify-start rounded-xl border-dashed border-border/50 bg-card px-4 py-3 text-muted-foreground">
               Kelola perangkat masuk
             </Button>
           </div>
         </Section>
 
-        <div className="rounded-2xl border border-destructive/40 bg-destructive/5 p-4">
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-sm font-medium text-foreground">Keluar dari akun</p>
@@ -94,7 +94,7 @@ const Settings = () => {
             <SignOutButton
               label="Keluar"
               buttonVariant="destructive"
-              className="w-full justify-center md:w-auto"
+              className="w-full justify-center rounded-xl md:w-auto"
               iconClassName="text-destructive-foreground"
             />
           </div>

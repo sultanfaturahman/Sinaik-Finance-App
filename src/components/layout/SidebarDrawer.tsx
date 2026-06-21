@@ -24,7 +24,7 @@ const DesktopSidebar = () => {
   const routes = APP_ROUTES.filter((route) => route.showInSidebar);
 
   return (
-    <aside className="hidden w-[260px] border-r border-border/70 bg-background/95 px-4 py-6 md:flex md:flex-col md:gap-8">
+    <aside className="hidden w-[260px] border-r border-border/50 bg-card/80 px-4 py-6 md:flex md:flex-col md:gap-8">
       <Brand />
       <nav className="flex flex-1 flex-col gap-1">
         {routes.map((route) => {
@@ -36,9 +36,9 @@ const DesktopSidebar = () => {
               asChild
               variant={isActive ? "secondary" : "ghost"}
               className={cn(
-                "justify-start gap-3 rounded-xl px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand",
-                isActive && "bg-brand/10 text-brand"
+                "justify-start gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-muted",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                isActive && "bg-primary/10 text-primary shadow-sm"
               )}
             >
               <NavLink to={route.path}>
@@ -98,7 +98,7 @@ const Brand = () => {
       <img
         src="/pwa-192x192.png"
         alt="SiNaik"
-        className="h-14 w-14 rounded-1xl object-contain"
+        className="h-14 w-14 rounded-xl object-contain"
       />
       <div className="space-y-1">
         <p className="text-lg font-semibold text-foreground">SiNaik</p>

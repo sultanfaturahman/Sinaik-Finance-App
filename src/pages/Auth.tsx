@@ -138,7 +138,7 @@ const Auth = () => {
       {/* PWA Install Banner for mobile users coming from email */}
       {showPwaBanner && (
         <div className="mb-4 w-full max-w-sm animate-in slide-in-from-top-2">
-          <Alert className="relative border-primary/50 bg-primary/10">
+          <Alert className="relative border-primary/30 bg-primary/10">
             <Smartphone className="h-4 w-4" />
             <AlertDescription className="pr-6 text-sm">
               <strong>Sudah install aplikasi SiNaik?</strong>
@@ -155,18 +155,23 @@ const Auth = () => {
           </Alert>
         </div>
       )}
-      <Card className="w-full max-w-sm shadow-lg">
-        <CardHeader className="text-center space-y-3">
-          <img src="/pwa-192x192.png" alt="SiNaik" className="mx-auto h-20 w-20 object-contain" />
-          <CardDescription className="text-sm">
-            Bersama Naik Kelas, UMKM Tumbuh Berkualitas
-          </CardDescription>
+      <Card className="w-full max-w-sm border-border/50 shadow-lg transition-shadow hover:shadow-xl">
+        <CardHeader className="space-y-4 text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-primary/10 p-3">
+            <img src="/pwa-192x192.png" alt="SiNaik" className="h-full w-full object-contain" />
+          </div>
+          <div>
+            <CardTitle className="text-2xl font-bold tracking-tight text-foreground">SiNaik</CardTitle>
+            <CardDescription className="mt-1 text-sm">
+              Bersama Naik Kelas, UMKM Tumbuh Berkualitas
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'login' | 'register')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Masuk</TabsTrigger>
-              <TabsTrigger value="register">Daftar</TabsTrigger>
+            <TabsList className="mb-5 grid w-full grid-cols-2 rounded-xl">
+              <TabsTrigger value="login" className="rounded-lg">Masuk</TabsTrigger>
+              <TabsTrigger value="register" className="rounded-lg">Daftar</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
@@ -185,6 +190,7 @@ const Auth = () => {
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     required
+                    className="rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
@@ -196,9 +202,10 @@ const Auth = () => {
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     required
+                    className="rounded-xl"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full rounded-xl" disabled={loading}>
                   {loading ? 'Memproses...' : 'Masuk'}
                 </Button>
               </form>
@@ -215,6 +222,7 @@ const Auth = () => {
                     value={registerName}
                     onChange={(e) => setRegisterName(e.target.value)}
                     required
+                    className="rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
@@ -226,6 +234,7 @@ const Auth = () => {
                     value={registerEmail}
                     onChange={(e) => setRegisterEmail(e.target.value)}
                     required
+                    className="rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
@@ -237,9 +246,10 @@ const Auth = () => {
                     value={registerPassword}
                     onChange={(e) => setRegisterPassword(e.target.value)}
                     required
+                    className="rounded-xl"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button type="submit" className="w-full rounded-xl" disabled={loading}>
                   {loading ? 'Memproses...' : 'Daftar'}
                 </Button>
               </form>

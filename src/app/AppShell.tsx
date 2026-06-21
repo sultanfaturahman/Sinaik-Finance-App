@@ -35,7 +35,7 @@ export const AppShell = ({
   const topbarActions = useMemo(() => headerActions, [headerActions]);
 
   return (
-    <div className="relative flex min-h-screen w-full bg-muted/20">
+    <div className="relative flex min-h-screen w-full bg-muted/30">
       <Suspense fallback={<SidebarSkeleton />}>
         <LazySidebarDrawer openMobile={mobileNavOpen} onOpenChange={setMobileNavOpen} />
       </Suspense>
@@ -49,8 +49,8 @@ export const AppShell = ({
           />
         </Suspense>
         <main className="flex-1">
-          <div className="mx-auto w-full max-w-[640px] px-3 pb-28 md:max-w-5xl md:px-6 md:pb-6">
-            <div className="pt-5 md:pt-8">{children}</div>
+          <div className="mx-auto w-full max-w-[640px] px-3 pb-28 md:max-w-5xl md:px-6 md:pb-8">
+            <div className="pt-4 md:pt-6">{children}</div>
           </div>
         </main>
       </div>

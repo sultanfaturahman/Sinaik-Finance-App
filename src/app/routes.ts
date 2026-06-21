@@ -54,7 +54,7 @@ export const APP_ROUTES: AppRoute[] = [
   },
   {
     path: "/settings",
-    label: "Settings",
+    label: "Pengaturan",
     icon: Settings,
     showInSidebar: true,
   }, 

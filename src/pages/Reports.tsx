@@ -248,10 +248,10 @@ const Reports = () => {
           ) : (
             <div className="space-y-4">
               {filteredReports.map((report) => (
-                <Card key={report.monthKey} className="rounded-2xl border bg-card shadow-sm">
+                <Card key={report.monthKey} className="group rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-200 hover:shadow-md">
                   <CardContent className="space-y-4 p-4 md:p-6">
                     <div className="flex flex-col justify-between gap-1 md:flex-row md:items-center">
-                      <h3 className="text-lg font-semibold leading-tight md:text-xl">
+                      <h3 className="text-lg font-semibold leading-tight tracking-tight md:text-xl">
                         {report.monthLabel}
                       </h3>
                       <p className="text-sm text-muted-foreground">
@@ -332,19 +332,19 @@ const HighlightCard = ({
   <div
     className={
       tone === "success"
-        ? "rounded-2xl border border-success/20 bg-success/10 p-4"
-        : "rounded-2xl border border-destructive/20 bg-destructive/10 p-4"
+        ? "rounded-2xl border border-success/20 bg-success/5 p-4 transition-colors hover:bg-success/10"
+        : "rounded-2xl border border-destructive/20 bg-destructive/5 p-4 transition-colors hover:bg-destructive/10"
     }
   >
-    <div className="flex items-center gap-2 text-sm font-medium">
+    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
       {icon}
       <span>{title}</span>
     </div>
     <p
       className={
         tone === "success"
-          ? "mt-2 text-2xl font-semibold text-success"
-          : "mt-2 text-2xl font-semibold text-destructive"
+          ? "mt-2 text-2xl font-bold tracking-tight text-success"
+          : "mt-2 text-2xl font-bold tracking-tight text-destructive"
       }
     >
       {value}
@@ -361,8 +361,8 @@ const TargetCard = ({
   description: string;
   icon: React.ReactNode;
 }) => (
-  <div className="flex items-start gap-3 rounded-2xl border bg-background px-4 py-4">
-    <span className="mt-1 rounded-xl bg-primary/10 p-2 text-primary">{icon}</span>
+  <div className="group flex items-start gap-3 rounded-2xl border border-border/50 bg-card p-4 transition-all duration-200 hover:border-primary/20 hover:shadow-sm">
+    <span className="mt-0.5 rounded-xl bg-primary/10 p-2.5 text-primary transition-colors group-hover:bg-primary/20">{icon}</span>
     <div>
       <p className="text-sm font-semibold text-foreground">{title}</p>
       <p className="text-xs text-muted-foreground leading-snug">{description}</p>

@@ -157,10 +157,12 @@ const Dashboard = () => {
             title="Selamat Datang di SiNaik!"
             description="Sistem Informasi Naik Kelas untuk UMKM Cilegon."
           >
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Mulai kelola keuangan bisnis Anda dengan mudah. Tambahkan transaksi pemasukan dan
-              pengeluaran untuk melihat laporan lengkap dan status klasifikasi UMKM Anda.
-            </p>
+            <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-5">
+              <p className="text-sm text-foreground/80 leading-relaxed">
+                Mulai kelola keuangan bisnis Anda dengan mudah. Tambahkan transaksi pemasukan dan
+                pengeluaran untuk melihat laporan lengkap dan status klasifikasi UMKM Anda.
+              </p>
+            </div>
             <div className="grid gap-3 text-sm md:grid-cols-3">
               <ChecklistItem title="Catat transaksi">
                 Kelola pemasukan dan pengeluaran harian secara rutin.
@@ -180,8 +182,12 @@ const Dashboard = () => {
 };
 
 const ChecklistItem = ({ title, children }: { title: string; children: ReactNode }) => (
-  <div className="flex items-start gap-3 rounded-2xl border border-dashed border-border/70 bg-background px-4 py-3">
-    <span className="mt-1 block h-2 w-2 rounded-full bg-primary" />
+  <div className="group flex items-start gap-3 rounded-2xl border border-border/50 bg-card p-4 transition-all duration-200 hover:border-primary/20 hover:shadow-sm">
+    <span className="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors duration-200 group-hover:bg-primary/20">
+      <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <polyline points="3,6 5,8 9,4" />
+      </svg>
+    </span>
     <div>
       <p className="font-medium text-foreground">{title}</p>
       <p className="text-xs text-muted-foreground leading-snug">{children}</p>

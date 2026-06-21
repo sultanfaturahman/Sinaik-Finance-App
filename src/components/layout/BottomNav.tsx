@@ -24,7 +24,7 @@ export const BottomNav = () => {
                 className={({ isActive }) =>
                   cn(
                     "flex h-12 flex-col items-center justify-center gap-1 px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors",
-                    (isActive || location.pathname.startsWith(path)) && "text-brand"
+                    (isActive || location.pathname.startsWith(path)) && "text-primary"
                   )
                 }
               >

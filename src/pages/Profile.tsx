@@ -181,9 +181,9 @@ const ProfilePage = () => {
         <ProfileSkeleton />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-          <Card className="border border-border/50">
+          <Card className="border border-border/50 shadow-sm">
             <CardHeader>
-              <CardTitle>Informasi Pemilik & Usaha</CardTitle>
+              <CardTitle className="tracking-tight">Informasi Pemilik & Usaha</CardTitle>
               <CardDescription>
                 Data ini membantu kami menyesuaikan rekomendasi dan laporan untuk usaha Anda.
               </CardDescription>
@@ -305,13 +305,13 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
 
-          <Card className="border border-dashed border-border/70 bg-background/60">
+          <Card className="border border-dashed border-border/60 bg-card/60 shadow-sm">
             <CardHeader>
-              <CardTitle>Status Profil</CardTitle>
+              <CardTitle className="tracking-tight">Status Profil</CardTitle>
               <CardDescription>Pantau kelengkapan data usaha Anda.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
-              <div className="flex items-center justify-between rounded-xl border border-border/60 bg-background px-3 py-2">
+              <div className="flex items-center justify-between rounded-xl border border-border/50 bg-card p-3">
                 <div>
                   <p className="font-medium text-foreground">Kelengkapan Profil</p>
                   <p className="text-xs text-muted-foreground">
@@ -325,12 +325,12 @@ const ProfilePage = () => {
                 </Badge>
               </div>
 
-              <div className="rounded-xl border border-border/60 bg-background px-3 py-2">
+              <div className="rounded-xl border border-border/50 bg-card p-3">
                 <p className="font-medium text-foreground">Manfaat Profil Lengkap</p>
                 <ul className="mt-2 space-y-2 text-xs text-muted-foreground">
-                  <li>• Rekomendasi kategori transaksi sesuai jenis usaha.</li>
-                  <li>• Insight margin dan target UMKM yang lebih akurat.</li>
-                  <li>• Pengingat dan strategi AI yang dipersonalisasi.</li>
+                  <li className="flex gap-2"><span className="shrink-0 text-primary">&#9679;</span> Rekomendasi kategori transaksi sesuai jenis usaha.</li>
+                  <li className="flex gap-2"><span className="shrink-0 text-primary">&#9679;</span> Insight margin dan target UMKM yang lebih akurat.</li>
+                  <li className="flex gap-2"><span className="shrink-0 text-primary">&#9679;</span> Pengingat dan strategi AI yang dipersonalisasi.</li>
                 </ul>
               </div>
 

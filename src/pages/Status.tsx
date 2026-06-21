@@ -180,7 +180,7 @@ const Status = () => {
             )}
 
             {marginDropAlert && marginTrend && (
-              <Alert className="border-amber-300 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10">
+              <Alert className="border-warning/40 bg-warning/10 dark:border-warning/30 dark:bg-warning/10">
                 <BellRing className="h-4 w-4 text-amber-500" />
                 <AlertTitle>
                   Margin turun {Math.abs(marginTrend.previous - marginTrend.current).toFixed(1)}%
@@ -214,7 +214,7 @@ const Status = () => {
           title="Klasifikasi UMKM Saat Ini"
           description="Status mengikuti peraturan terbaru Kementerian Koperasi dan UKM."
         >
-          <div className="flex flex-col gap-4 rounded-2xl border border-primary/40 bg-primary/5 p-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-4 rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 p-5 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-3">
               <span
                 className="flex h-12 w-12 items-center justify-center rounded-2xl"
@@ -231,19 +231,19 @@ const Status = () => {
                 </p>
               </div>
             </div>
-            <div className="rounded-2xl bg-background px-4 py-3 text-sm shadow-sm">
-              <p className="text-muted-foreground">Omzet Tahunan</p>
-              <p className="text-lg font-semibold text-foreground">{formatCurrency(annualRevenue)}</p>
+            <div className="rounded-2xl bg-card px-4 py-3 text-sm shadow-sm">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Omzet Tahunan</p>
+              <p className="text-lg font-bold text-foreground">{formatCurrency(annualRevenue)}</p>
             </div>
           </div>
 
           {nextLevel && (
-            <div className="space-y-3 rounded-2xl border border-border/70 bg-background p-4">
+            <div className="space-y-3 rounded-2xl border border-border/50 bg-card p-5">
               <div className="flex items-center justify-between text-sm font-medium">
                 <span>Progres menuju level {nextLevel.label}</span>
-                <span>{progressPercentage.toFixed(0)}%</span>
+                <span className="tabular-nums">{progressPercentage.toFixed(0)}%</span>
               </div>
-              <Progress value={progressPercentage} className="h-2" />
+              <Progress value={progressPercentage} className="h-2.5" />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>{formatCurrency(currentClassification.minRevenue)}</span>
                 <span>{formatCurrency(nextLevel.minRevenue)}</span>
@@ -255,15 +255,15 @@ const Status = () => {
         {nextLevel && (
           <Section title="Target Selanjutnya">
             <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-2xl border bg-background px-4 py-4">
-                <p className="text-sm text-muted-foreground">Target omzet minimum:</p>
-                <p className="text-lg font-semibold text-foreground">
+              <div className="rounded-2xl border border-border/50 bg-card px-4 py-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Target omzet minimum</p>
+                <p className="mt-1 text-lg font-bold text-foreground">
                   {formatCurrency(nextLevel.minRevenue)}
                 </p>
               </div>
-              <div className="rounded-2xl border bg-background px-4 py-4">
-                <p className="text-sm text-muted-foreground">Selisih menuju target:</p>
-                <p className="text-lg font-semibold text-primary">
+              <div className="rounded-2xl border border-border/50 bg-card px-4 py-4">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Selisih menuju target</p>
+                <p className="mt-1 text-lg font-bold text-primary">
                   {formatCurrency(nextLevel.minRevenue - annualRevenue)}
                 </p>
               </div>
@@ -278,16 +278,16 @@ const Status = () => {
               return (
                 <div
                   key={rule.level}
-                  className={`flex items-center justify-between rounded-2xl border-2 px-4 py-4 transition-colors ${
+                  className={`flex items-center justify-between rounded-2xl border-2 px-4 py-4 transition-all duration-200 ${
                     isCurrentLevel
-                      ? "border-primary bg-primary/10"
-                      : "border-transparent bg-background"
+                      ? "border-primary/60 bg-primary/5 shadow-sm"
+                      : "border-transparent bg-card hover:border-border/50"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <span
-                      className="h-3 w-3 shrink-0 rounded-full"
-                      style={{ backgroundColor: rule.color }}
+                      className="h-3.5 w-3.5 shrink-0 rounded-full ring-2 ring-offset-2 ring-offset-background"
+                      style={{ backgroundColor: rule.color, boxShadow: `0 0 0 2px ${rule.color}33` }}
                     />
                     <div>
                       <p className={`font-semibold ${isCurrentLevel ? "text-foreground" : "text-foreground/80"}`}>
@@ -297,7 +297,7 @@ const Status = () => {
                     </div>
                   </div>
                   {isCurrentLevel && (
-                    <span className="shrink-0 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+                    <span className="shrink-0 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground shadow-sm">
                       Level Saat Ini
                     </span>
                   )}
