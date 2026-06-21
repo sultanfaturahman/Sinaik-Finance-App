@@ -57,31 +57,31 @@ export const StatCard = ({
       data-testid="stat-card"
       className="group rounded-xl border border-border/50 bg-card shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
     >
-      <CardHeader className="flex flex-row items-start justify-between gap-3 p-5">
-        <div className="min-w-0 flex-1 space-y-1.5">
-          <CardTitle className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+      <CardHeader className="p-4 sm:p-5 space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-muted-foreground truncate">
             {title}
           </CardTitle>
-          <div className={cn("text-xl font-bold tracking-tight sm:text-2xl", styles.value)}>
-            {value}
-          </div>
-        </div>
-        {icon && (
-          <div
-            className={cn(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-              styles.bg
-            )}
-          >
-            <div className={cn("h-5 w-5", styles.icon)}>
-              {icon}
+          {icon && (
+            <div
+              className={cn(
+                "flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-lg",
+                styles.bg
+              )}
+            >
+              <div className={cn("h-3.5 w-3.5 sm:h-4 sm:w-4", styles.icon)}>
+                {icon}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        <div className={cn("text-lg sm:text-xl md:text-2xl font-bold tracking-tight", styles.value)}>
+          {value}
+        </div>
       </CardHeader>
       {helper && (
-        <CardContent className="px-5 pb-5 pt-0">
-          <CardDescription className="text-xs text-muted-foreground">
+        <CardContent className="px-4 pb-4 sm:px-5 sm:pb-5 pt-0">
+          <CardDescription className="text-[11px] sm:text-xs text-muted-foreground line-clamp-2">
             {helper}
           </CardDescription>
         </CardContent>
