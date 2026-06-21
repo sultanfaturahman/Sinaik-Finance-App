@@ -24,9 +24,9 @@ const DesktopSidebar = () => {
   const routes = APP_ROUTES.filter((route) => route.showInSidebar);
 
   return (
-    <aside className="hidden w-[260px] border-r border-border/50 bg-card/80 px-4 py-6 md:flex md:flex-col md:gap-8">
+    <aside className="hidden w-[280px] border-r border-border/40 bg-card px-5 py-6 md:flex md:flex-col md:gap-6">
       <Brand />
-      <nav className="flex flex-1 flex-col gap-1">
+      <nav className="flex flex-1 flex-col gap-2">
         {routes.map((route) => {
           const isActive = location.pathname.startsWith(route.path);
           const Icon = route.icon;
@@ -34,14 +34,16 @@ const DesktopSidebar = () => {
             <Button
               key={route.path}
               asChild
-              variant={isActive ? "secondary" : "ghost"}
+              variant="ghost"
               className={cn(
-                "justify-start gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:bg-muted",
+                "relative justify-start gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-200",
+                "hover:text-foreground hover:bg-muted/50",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                isActive && "bg-primary/10 text-primary shadow-sm"
+                isActive && "text-primary"
               )}
             >
               <NavLink to={route.path}>
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-full bg-primary transition-all duration-300" style={{opacity: isActive ? 1 : 0}} />
                 <span className="flex items-center gap-3">
                   <Icon className="h-5 w-5" />
                   <span>{route.label}</span>

@@ -87,7 +87,7 @@ const Dashboard = () => {
     setShowOnboarding(!onboardingCompleted);
   }, [onboardingCompleted, onboardingReady]);
 
-  type StatVariant = "default" | "positive" | "negative";
+  type StatVariant = "default" | "positive" | "negative" | "purple" | "orange" | "pink";
   const statCards: Array<{
     title: string;
     value: ReactNode;
@@ -98,28 +98,29 @@ const Dashboard = () => {
     {
       title: "Total Pemasukan",
       value: formatCurrency(stats.totalIncome),
-      icon: <TrendingUp className="h-5 w-5 text-success" />,
+      icon: <TrendingUp className="h-5 w-5" />,
       variant: "positive" as const,
       helper: "Akumulasi sejak awal tahun",
     },
     {
       title: "Total Pengeluaran",
       value: formatCurrency(stats.totalExpense),
-      icon: <TrendingDown className="h-5 w-5 text-destructive" />,
-      variant: "negative" as const,
+      icon: <TrendingDown className="h-5 w-5" />,
+      variant: "orange" as const,
       helper: "Termasuk biaya operasional dan tetap",
     },
     {
       title: "Laba Bersih",
       value: formatCurrency(stats.netProfit),
-      icon: <Wallet className="h-5 w-5 text-primary" />,
+      icon: <Wallet className="h-5 w-5" />,
       variant: stats.netProfit >= 0 ? ("positive" as StatVariant) : ("negative" as StatVariant),
       helper: stats.netProfit >= 0 ? "Kondisi kas sehat" : "Perlu evaluasi pengeluaran",
     },
     {
       title: "Total Transaksi",
       value: stats.transactionCount.toLocaleString("id-ID"),
-      icon: <Receipt className="h-5 w-5 text-primary" />,
+      icon: <Receipt className="h-5 w-5" />,
+      variant: "purple" as const,
       helper: "Jumlah transaksi tercatat",
     },
   ];
@@ -139,8 +140,8 @@ const Dashboard = () => {
       {loading ? (
         <DashboardSkeleton />
       ) : (
-        <div className="flex flex-col gap-6">
-          <div data-testid="stats-grid" className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="flex flex-col gap-8">
+          <div data-testid="stats-grid" className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {statCards.map((card) => (
               <StatCard
                 key={card.title}
@@ -157,20 +158,20 @@ const Dashboard = () => {
             title="Selamat Datang di SiNaik!"
             description="Sistem Informasi Naik Kelas untuk UMKM Cilegon."
           >
-            <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-5">
-              <p className="text-sm text-foreground/80 leading-relaxed">
+            <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/8 via-purple-500/5 to-pink-500/5 p-6">
+              <p className="text-sm font-medium text-foreground leading-relaxed">
                 Mulai kelola keuangan bisnis Anda dengan mudah. Tambahkan transaksi pemasukan dan
                 pengeluaran untuk melihat laporan lengkap dan status klasifikasi UMKM Anda.
               </p>
             </div>
-            <div className="grid gap-3 text-sm md:grid-cols-3">
-              <ChecklistItem title="Catat transaksi">
+            <div className="grid gap-4 text-sm md:grid-cols-3">
+              <ChecklistItem title="Catat transaksi" color="purple">
                 Kelola pemasukan dan pengeluaran harian secara rutin.
               </ChecklistItem>
-              <ChecklistItem title="Lihat laporan">
+              <ChecklistItem title="Lihat laporan" color="orange">
                 Analisis keuangan bulanan dan tahunan dengan cepat.
               </ChecklistItem>
-              <ChecklistItem title="Cek status UMKM">
+              <ChecklistItem title="Cek status UMKM" color="pink">
                 Pantau klasifikasi bisnis Anda dan target level berikutnya.
               </ChecklistItem>
             </div>
@@ -181,19 +182,28 @@ const Dashboard = () => {
   );
 };
 
-const ChecklistItem = ({ title, children }: { title: string; children: ReactNode }) => (
-  <div className="group flex items-start gap-3 rounded-2xl border border-border/50 bg-card p-4 transition-all duration-200 hover:border-primary/20 hover:shadow-sm">
-    <span className="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors duration-200 group-hover:bg-primary/20">
-      <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-        <polyline points="3,6 5,8 9,4" />
-      </svg>
-    </span>
-    <div>
-      <p className="font-medium text-foreground">{title}</p>
-      <p className="text-xs text-muted-foreground leading-snug">{children}</p>
+const ChecklistItem = ({ title, children, color = "primary" }: { title: string; children: ReactNode; color?: "primary" | "purple" | "orange" | "pink" }) => {
+  const colorStyles = {
+    primary: "bg-primary/10 text-primary group-hover:bg-primary/20",
+    purple: "bg-purple/15 text-purple-600 dark:text-purple-400 group-hover:bg-purple/25",
+    orange: "bg-orange/15 text-orange-600 dark:text-orange-400 group-hover:bg-orange/25",
+    pink: "bg-pink/15 text-pink-600 dark:text-pink-400 group-hover:bg-pink/25",
+  };
+
+  return (
+    <div className="group flex items-start gap-3 rounded-xl border border-border/40 bg-card p-4 transition-all duration-200 hover:border-border/60 hover:shadow-md">
+      <span className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${colorStyles[color]}`}>
+        <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <polyline points="3,6 5,8 9,4" />
+        </svg>
+      </span>
+      <div className="min-w-0">
+        <p className="font-semibold text-foreground text-sm">{title}</p>
+        <p className="text-xs text-muted-foreground leading-snug">{children}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const DashboardSkeleton = () => (
   <div className="flex flex-col gap-6">

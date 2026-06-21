@@ -195,25 +195,25 @@ const Reports = () => {
             </Suspense>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Total Pemasukan"
               value={formatCurrency(totals.income)}
-              icon={<TrendingUp className="h-5 w-5 text-success" />}
+              icon={<TrendingUp className="h-5 w-5" />}
               helper={`Periode ${selectedYear}`}
               variant="positive"
             />
             <StatCard
               title="Total Pengeluaran"
               value={formatCurrency(totals.expense)}
-              icon={<TrendingDown className="h-5 w-5 text-destructive" />}
+              icon={<TrendingDown className="h-5 w-5" />}
               helper="Termasuk biaya tetap & variabel"
-              variant="negative"
+              variant="orange"
             />
             <StatCard
               title="Laba Bersih"
               value={formatCurrency(totals.profit)}
-              icon={<Wallet className="h-5 w-5 text-primary" />}
+              icon={<Wallet className="h-5 w-5" />}
               helper={
                 totals.profit >= 0 ? "Kas stabil" : "Perlu evaluasi pengeluaran besar"
               }
@@ -224,9 +224,9 @@ const Reports = () => {
               value={`${totals.margin.toFixed(1)}%`}
               icon={
                 totals.marginDelta >= 0 ? (
-                  <ArrowUpRight className="h-5 w-5 text-success" />
+                  <ArrowUpRight className="h-5 w-5" />
                 ) : (
-                  <ArrowDownRight className="h-5 w-5 text-destructive" />
+                  <ArrowDownRight className="h-5 w-5" />
                 )
               }
               helper={
@@ -236,6 +236,7 @@ const Reports = () => {
                     )}% dari bulan sebelumnya`
                   : "Data satu bulan"
               }
+              variant="purple"
             />
           </div>
 

@@ -9,16 +9,41 @@ export default {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#0E7490",
+          DEFAULT: "hsl(219, 76%, 55%)",
           foreground: "#F8FAFC",
         },
+        purple: {
+          DEFAULT: "hsl(259, 100%, 60%)",
+          light: "hsl(259, 100%, 70%)",
+          dark: "hsl(259, 100%, 50%)",
+        },
+        orange: {
+          DEFAULT: "hsl(38, 92%, 50%)",
+          light: "hsl(38, 92%, 60%)",
+          dark: "hsl(38, 92%, 40%)",
+        },
+        pink: {
+          DEFAULT: "hsl(343, 79%, 54%)",
+          light: "hsl(343, 79%, 64%)",
+          dark: "hsl(343, 79%, 44%)",
+        },
+        cyan: {
+          DEFAULT: "hsl(182, 100%, 50%)",
+          light: "hsl(182, 100%, 60%)",
+          dark: "hsl(182, 100%, 40%)",
+        },
+        emerald: {
+          DEFAULT: "hsl(158, 89%, 43%)",
+          light: "hsl(158, 89%, 53%)",
+          dark: "hsl(158, 89%, 33%)",
+        },
         success: {
-          DEFAULT: "#22C55E",
+          DEFAULT: "hsl(158, 89%, 43%)",
           foreground: "#F0FDF4",
         },
         warning: {
-          DEFAULT: "#F59E0B",
-          foreground: "#FEF3C7",
+          DEFAULT: "hsl(38, 92%, 50%)",
+          foreground: "#FFFBEB",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

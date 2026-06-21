@@ -35,7 +35,7 @@ export const AppShell = ({
   const topbarActions = useMemo(() => headerActions, [headerActions]);
 
   return (
-    <div className="relative flex min-h-screen w-full bg-muted/30">
+    <div className="relative flex min-h-screen w-full bg-gradient-to-br from-background via-background to-muted/20">
       <Suspense fallback={<SidebarSkeleton />}>
         <LazySidebarDrawer openMobile={mobileNavOpen} onOpenChange={setMobileNavOpen} />
       </Suspense>
@@ -49,8 +49,8 @@ export const AppShell = ({
           />
         </Suspense>
         <main className="flex-1">
-          <div className="mx-auto w-full max-w-[640px] px-3 pb-28 md:max-w-5xl md:px-6 md:pb-8">
-            <div className="pt-4 md:pt-6">{children}</div>
+          <div className="mx-auto w-full max-w-[640px] px-4 pb-28 md:max-w-5xl md:px-7 md:pb-8">
+            <div className="pt-5 md:pt-7">{children}</div>
           </div>
         </main>
       </div>
@@ -67,20 +67,20 @@ export const AppShell = ({
 };
 
 const SidebarSkeleton = () => (
-  <div className="hidden w-[260px] border-r border-border/70 bg-background/80 px-4 py-6 md:flex md:flex-col md:gap-6">
-    <div className="h-12 w-32 rounded-xl bg-muted animate-pulse" />
+  <div className="hidden w-[280px] border-r border-border/40 bg-card px-5 py-6 md:flex md:flex-col md:gap-6">
+    <div className="h-12 w-32 rounded-lg bg-muted animate-pulse" />
     {Array.from({ length: 5 }).map((_, index) => (
-      <div key={`sidebar-skeleton-${index}`} className="h-10 rounded-xl bg-muted/70 animate-pulse" />
+      <div key={`sidebar-skeleton-${index}`} className="h-10 rounded-lg bg-muted/60 animate-pulse" />
     ))}
   </div>
 );
 
 const TopbarSkeleton = () => (
-  <header className="border-b border-border/70 bg-background/80 px-4 py-4">
+  <header className="border-b border-border/40 bg-background/80 px-4 py-4">
     <div className="h-6 w-40 rounded-lg bg-muted animate-pulse" />
   </header>
 );
 
 const BottomNavSkeleton = () => (
-  <div className="fixed bottom-0 left-0 right-0 h-16 border-t border-border/70 bg-background/80 md:hidden" />
+  <div className="fixed bottom-0 left-0 right-0 h-16 border-t border-border/40 bg-background/80 md:hidden" />
 );

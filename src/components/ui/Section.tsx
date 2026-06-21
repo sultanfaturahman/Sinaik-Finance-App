@@ -18,15 +18,15 @@ export const Section = ({
 }: SectionProps) => (
   <section
     className={cn(
-      "rounded-2xl border bg-card shadow-sm p-5 md:p-6 transition-shadow",
+      "rounded-xl border border-border/40 bg-card shadow-sm p-6 md:p-7 transition-all hover:shadow-md",
       className
     )}
   >
     {(title || description || actions) && (
-      <header className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="space-y-1">
+      <header className="mb-6 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-1.5">
           {typeof title === "string" ? (
-            <h2 className="text-lg font-semibold leading-tight tracking-tight md:text-xl">{title}</h2>
+            <h2 className="text-lg font-bold tracking-tight text-foreground md:text-xl">{title}</h2>
           ) : (
             title
           )}
