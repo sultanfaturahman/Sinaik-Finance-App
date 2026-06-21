@@ -18,7 +18,7 @@ export const Section = ({
 }: SectionProps) => (
   <section
     className={cn(
-      "rounded-xl border border-border/40 bg-card shadow-sm p-6 md:p-7 transition-all hover:shadow-md",
+      "rounded-xl border border-border/50 bg-card shadow-sm p-5 md:p-6",
       className
     )}
   >

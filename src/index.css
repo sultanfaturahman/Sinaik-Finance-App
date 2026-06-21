@@ -17,19 +17,19 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222 84% 5%;
 
-    --primary: 219 76% 55%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 259 100% 60%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 9% 46%;
 
-    --muted: 220 13% 91%;
-    --muted-foreground: 220 8% 40%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 158 89% 43%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 9% 46%;
 
-    --success: 158 89% 43%;
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -37,25 +37,18 @@ All colors MUST be HSL.
 
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 219 76% 55%;
+    --ring: 221 83% 53%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 222 84% 5%;
-    --sidebar-primary: 219 76% 55%;
+    --sidebar-primary: 221 83% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 13% 91%;
-    --sidebar-accent-foreground: 219 76% 55%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 221 83% 53%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 219 76% 55%;
-
-    /* Custom accent colors - vibrant palette */
-    --accent-purple: 259 100% 60%;
-    --accent-orange: 38 92% 50%;
-    --accent-pink: 343 79% 54%;
-    --accent-cyan: 182 100% 50%;
-    --accent-emerald: 158 89% 43%;
+    --sidebar-ring: 221 83% 53%;
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(219, 76%, 55%), hsl(259, 100%, 60%));
@@ -80,48 +73,36 @@ All colors MUST be HSL.
     --popover: 220 17% 14%;
     --popover-foreground: 220 14% 96%;
 
-    --primary: 219 75% 62%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 259 100% 68%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 215 28% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 220 17% 22%;
-    --muted-foreground: 220 8% 60%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 217 33% 60%;
 
-    --accent: 158 89% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 215 28% 17%;
+    --accent-foreground: 210 40% 98%;
 
-    --success: 158 89% 50%;
+    --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 17% 22%;
-    --input: 220 17% 22%;
-    --ring: 219 75% 62%;
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 217 91% 60%;
 
     --sidebar-background: 220 17% 14%;
-    --sidebar-foreground: 220 14% 96%;
-    --sidebar-primary: 219 75% 62%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 17% 22%;
-    --sidebar-accent-foreground: 220 14% 96%;
-    --sidebar-border: 220 17% 22%;
-    --sidebar-ring: 219 75% 62%;
-
-    /* Custom accent colors - dark mode */
-    --accent-purple: 259 100% 68%;
-    --accent-orange: 38 92% 58%;
-    --accent-pink: 343 79% 62%;
-    --accent-cyan: 182 100% 58%;
-    --accent-emerald: 158 89% 50%;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(219, 75%, 62%), hsl(259, 100%, 68%));
-    --gradient-success: linear-gradient(135deg, hsl(158, 89%, 50%), hsl(182, 100%, 58%));
-    --gradient-vibrant: linear-gradient(135deg, hsl(259, 100%, 68%), hsl(343, 79%, 62%));
+    --sidebar-accent: 215 28% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 28% 17%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 

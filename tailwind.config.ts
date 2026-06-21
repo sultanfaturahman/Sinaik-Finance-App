@@ -9,40 +9,15 @@ export default {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "hsl(219, 76%, 55%)",
+          DEFAULT: "hsl(var(--primary))",
           foreground: "#F8FAFC",
         },
-        purple: {
-          DEFAULT: "hsl(259, 100%, 60%)",
-          light: "hsl(259, 100%, 70%)",
-          dark: "hsl(259, 100%, 50%)",
-        },
-        orange: {
-          DEFAULT: "hsl(38, 92%, 50%)",
-          light: "hsl(38, 92%, 60%)",
-          dark: "hsl(38, 92%, 40%)",
-        },
-        pink: {
-          DEFAULT: "hsl(343, 79%, 54%)",
-          light: "hsl(343, 79%, 64%)",
-          dark: "hsl(343, 79%, 44%)",
-        },
-        cyan: {
-          DEFAULT: "hsl(182, 100%, 50%)",
-          light: "hsl(182, 100%, 60%)",
-          dark: "hsl(182, 100%, 40%)",
-        },
-        emerald: {
-          DEFAULT: "hsl(158, 89%, 43%)",
-          light: "hsl(158, 89%, 53%)",
-          dark: "hsl(158, 89%, 33%)",
-        },
         success: {
-          DEFAULT: "hsl(158, 89%, 43%)",
+          DEFAULT: "hsl(var(--success))",
           foreground: "#F0FDF4",
         },
         warning: {
-          DEFAULT: "hsl(38, 92%, 50%)",
+          DEFAULT: "#F59E0B",
           foreground: "#FFFBEB",
         },
         border: "hsl(var(--border))",
@@ -87,7 +62,7 @@ export default {
       },
       borderRadius: {
         xl: "12px",
-        "2xl": "20px",
+        "2xl": "16px",
       },
       spacing: {
         3: "0.75rem",
@@ -99,9 +74,9 @@ export default {
         24: "6rem",
       },
       boxShadow: {
-        sm: "0 1px 2px 0 rgba(15, 23, 42, 0.08)",
-        md: "0 8px 24px -12px rgba(15, 23, 42, 0.25)",
-        lg: "0 16px 32px -12px rgba(15, 23, 42, 0.35)",
+        sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        md: "0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05)",
+        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04)",
       },
       keyframes: {
         "accordion-down": {

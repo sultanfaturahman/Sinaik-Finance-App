@@ -195,7 +195,7 @@ const Reports = () => {
             </Suspense>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Total Pemasukan"
               value={formatCurrency(totals.income)}
@@ -249,7 +249,7 @@ const Reports = () => {
           ) : (
             <div className="space-y-4">
               {filteredReports.map((report) => (
-                <Card key={report.monthKey} className="group rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-200 hover:shadow-md">
+                <Card key={report.monthKey} className="rounded-xl border border-border/50 bg-card shadow-sm">
                   <CardContent className="space-y-4 p-4 md:p-6">
                     <div className="flex flex-col justify-between gap-1 md:flex-row md:items-center">
                       <h3 className="text-lg font-semibold leading-tight tracking-tight md:text-xl">
@@ -333,19 +333,19 @@ const HighlightCard = ({
   <div
     className={
       tone === "success"
-        ? "rounded-2xl border border-success/20 bg-success/5 p-4 transition-colors hover:bg-success/10"
-        : "rounded-2xl border border-destructive/20 bg-destructive/5 p-4 transition-colors hover:bg-destructive/10"
+        ? "rounded-xl bg-emerald-50 dark:bg-emerald-500/10 p-4"
+        : "rounded-xl bg-red-50 dark:bg-red-500/10 p-4"
     }
   >
-    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
       {icon}
       <span>{title}</span>
     </div>
     <p
       className={
         tone === "success"
-          ? "mt-2 text-2xl font-bold tracking-tight text-success"
-          : "mt-2 text-2xl font-bold tracking-tight text-destructive"
+          ? "mt-1.5 text-lg font-bold text-emerald-700 dark:text-emerald-400"
+          : "mt-1.5 text-lg font-bold text-red-600 dark:text-red-400"
       }
     >
       {value}
@@ -362,11 +362,11 @@ const TargetCard = ({
   description: string;
   icon: React.ReactNode;
 }) => (
-  <div className="group flex items-start gap-3 rounded-2xl border border-border/50 bg-card p-4 transition-all duration-200 hover:border-primary/20 hover:shadow-sm">
-    <span className="mt-0.5 rounded-xl bg-primary/10 p-2.5 text-primary transition-colors group-hover:bg-primary/20">{icon}</span>
+  <div className="flex items-start gap-3 rounded-xl border border-border/50 bg-card p-4">
+    <span className="mt-0.5 rounded-lg bg-primary/10 p-2 text-primary">{icon}</span>
     <div>
       <p className="text-sm font-semibold text-foreground">{title}</p>
-      <p className="text-xs text-muted-foreground leading-snug">{description}</p>
+      <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">{description}</p>
     </div>
   </div>
 );
